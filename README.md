@@ -1,2 +1,2 @@
-# FirstC-
+# FirstC++
 C++ razni primjeri
