@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string> //Without this is OK but std::string used instead
+#include <string.h> //Without this is OK but std::string used instead
 
 using namespace std;
 
@@ -37,6 +37,11 @@ public:
 		cout << "Temp constructing:" << endl;
 	}
 
+	Temp(string name) {
+		cout << "Temp constructing with name:" << endl;
+		this->name = name;
+	}
+
 	~Temp() {
 		cout << "Temp destructing: " << this << endl;
 	}
@@ -61,13 +66,21 @@ public:
 		this->name = other.name;
 		return *this;
 	}
+
+	void operator()(const char* str) {
+		cout << "Temp () operator: " << endl;
+		cout << "New name is: " << str << endl;
+//		str.copy(name,str.length());
+		name = str; //kako kopirati string
+//		strcpy(name.c_str(), str);
+	}
 };
 
 Temp createTemp() {
 	Temp temp;
 	temp.setName("localTemp");
-	cout << "Local Temp address " << &temp << endl;
-	cout << "Local Temp name " << temp.getName() << endl;
+	cout << "Local: Temp address " << &temp << endl;
+	cout << "Local: Temp name " << temp.getName() << endl;
 	//creates temp, but when sending result, copy constructor is invoked
 	//and temp is transfered by value
 	return temp;
@@ -78,7 +91,7 @@ struct DemoStruct {
 	double someDouble;
 	//struct Constructor, da i ovo postoji
 	DemoStruct(int i = 0, double d = 0) :
-			someInt(i), someDouble(d) {
+			someInt(i), someDouble(d) { // ovo nisu constructori, ovo je function call operator (operator())
 	}
 };
 
@@ -275,7 +288,7 @@ int main() {
 	version << "Version string " << __VERSION__;
 	cout << version.str() << endl;
 
-	if (true) {
+	if (execute) {
 		cout << endl << ">>> Console input test <<<" << endl;
 		cout << "Enter your name: " << flush;
 		string input;
@@ -419,7 +432,7 @@ int main() {
 		displayLine(line2);
 	}
 
-	if (true) {
+	if (execute) {
 		cout << endl << "!!!Class constructing/destructing!!!" << endl;
 		cout << ">> new Temp" << endl;
 		//ovdje se u "istom" trenutku temp i deklarira i incijalizira,
@@ -437,6 +450,31 @@ int main() {
 //		temp = new Temp(); // temp bi trebao biti pointer Temp*
 //		cout << ">> New Temp name " << temp.getName() << endl;
 //		cout << ">> New Temp address " << &temp << endl;
+
+	}
+
+	if (true) {
+		cout << endl << "!!!Operator overloading!!!" << endl;
+		cout << ">> create new Temp" << endl;
+		//ovdje se u "istom" trenutku temp i deklarira i incijalizira,
+		//na djelu je optimizacija i nema niti copy construktora niti = operatora
+		Temp temp = createTemp();
+		//ovdje je na djelu  string konstruktor a ne () operator
+		Temp temp2("temp's dva ime");
+		temp.setName("mainTemp");
+		cout << ">> main: temp address " << &temp << endl;
+		cout << ">> main: temp name " << temp.getName() << endl;
+		cout << ">> function createTemp()" << endl;
+		// u ovom slucaju aktivira se = operator
+		temp = createTemp();
+		cout << ">> main: temp address " << &temp << endl;
+		cout << ">> main: temp name " << temp.getName() << endl;
+		// u ovom slucaju aktivira se () iliti functional operator
+		temp("novo ime");
+		cout << ">> main: temp address " << &temp << endl;
+		cout << ">> main: temp name " << temp.getName() << endl;
+		cout << ">> main: temp2 address " << &temp2 << endl;
+		cout << ">> main: temp2 name " << temp2.getName() << endl;
 
 	}
 
