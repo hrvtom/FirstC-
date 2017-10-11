@@ -26,6 +26,7 @@ void printCharacter(char* c, int i) {
 class Temp {
 private:
 	string name;
+	int value;
 
 	// ovdje se zali da je copy constructor private
 //	Temp(const Temp &other) {
@@ -33,6 +34,8 @@ private:
 //	}
 
 public:
+	int value2;
+
 	Temp() {
 		cout << "Temp constructing:" << endl;
 	}
@@ -40,6 +43,17 @@ public:
 	Temp(string name) {
 		cout << "Temp constructing with name:" << endl;
 		this->name = name;
+
+	}
+
+	Temp(string name, int value) :
+			name(name), value(value) {
+		cout << "Temp constructing with name and value:" << endl;
+		// initialization of name and value is done before
+		// constructor body is executed
+		cout << "name in constructor: " << this->name << endl;
+		cout << "value in constructor: " << this->value << endl;
+		cout << "value2 in constructor: " << this->value2 << endl;
 	}
 
 	~Temp() {
@@ -54,7 +68,10 @@ public:
 		return name;
 	}
 
-	//A ovdje ga ne sljivi ni 5 %
+	int getValue() {
+		return value;
+	}
+
 	Temp(const Temp &other) {
 		cout << "Temp copy constructing: " << endl;
 	}
@@ -73,6 +90,11 @@ public:
 //		str.copy(name,str.length());
 		name = str; //kako kopirati string
 //		strcpy(name.c_str(), str);
+	}
+
+	//overloading () operator
+	void operator()(int num) {
+		cout << "Overloading () operator" << endl;
 	}
 };
 
@@ -443,8 +465,8 @@ int main() {
 		cout << ">> main temp name " << temp.getName() << endl;
 		cout << ">> function createTemp()" << endl;
 		// u ovom slucaju aktivira se = operator
+		// a ne transfer by value iz createTemp()
 		temp = createTemp();
-// temp from function is transfered by value
 		cout << ">> Created Temp name " << temp.getName() << endl;
 		cout << ">> Created Temp address " << &temp << endl;
 //		temp = new Temp(); // temp bi trebao biti pointer Temp*
@@ -475,7 +497,18 @@ int main() {
 		cout << ">> main: temp name " << temp.getName() << endl;
 		cout << ">> main: temp2 address " << &temp2 << endl;
 		cout << ">> main: temp2 name " << temp2.getName() << endl;
+		// overloadani () operator
+		temp(32);
 
+	}
+
+	if (true) {
+		cout << endl << "!!!Using intialization lists to initialize fields!!!"
+				<< endl;
+		cout << ">> create new Temp with initialization list" << endl;
+		Temp temp("ime", 21);
+		cout << ">> temp.name after construction " << temp.getName() << endl;
+		cout << ">> temp.value after construction " << temp.getValue() << endl;
 	}
 
 	if (execute) {
