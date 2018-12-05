@@ -14,10 +14,12 @@ using namespace std;
 
 const int MAX = 3;
 
+// print characters starting from provided index
 void printString(char *c, int i) {
 	std::cout << (c + i) << endl;
 }
 
+//print single character at provided index
 void printCharacter(char* c, int i) {
 	cout << *(c + i) << endl;
 	cout << c[i] << endl; // a i ovo radi !!!!(zasto??)
@@ -106,6 +108,11 @@ Temp createTemp() {
 	//creates temp, but when sending result, copy constructor is invoked
 	//and temp is transfered by value
 	return temp;
+	//If temp is returned as a pointer(*temp), the temp object will be destroyed at the
+	//end of this method, and the caller will end up wit the poniter to object that
+	//doesn't exist any more. this causes Segmentation fault.
+	//solution is to create temp object with help of new Temp(), this object is stored in heap memory
+	//and must be destroyed manually.
 }
 
 struct DemoStruct {
@@ -122,30 +129,43 @@ public:
 	double length = 0.0;
 	double breadth = 0.0;
 	double height = 0.0;
+	int index;
+	static int count;
 
 	double getVoume(void) {
 		return length * breadth * height;
 	}
+
+	void printBox() {
+		cout << "length:" << length << " breath:" << breadth << " height:"
+				<< breadth << endl;
+	}
+
 	void setLength(double len);
 	void setBreadth(double bre);
 	void setHeight(double hei);
 
 	Box() { //empty constructor
-		cout << ">>> Box is being created <<<" << endl;
+		count++;
+		index = count;
+		cout << "Box " << index << " is being created" << endl;
 	}
 	Box(double len, double bre, double hei);
 	/*
 	 Box(double len, double bre, double hei) {
 	 length = len;
-	 breadth = bre;
+	 breadth		cout << ">>> Box" << count << " is being created <<<" << endl;
+	 = bre;
 	 height = hei;
 	 cout << ">>> Box with parameters is being created <<<" << endl;
 	 }
 	 */
-
+	Box(Box&);
 	~Box(); // destructor, cannot take any parameters
 
 };
+
+int Box::count = 0;
 
 void Box::setLength(double len) {
 	cout << "Length" << endl;
@@ -163,12 +183,35 @@ void Box::setHeight(double hei) {
 }
 
 Box::Box(double len, double bre, double hei) :
-		length(len), breadth(bre), height(hei) {
+		length(len), breadth(bre) {
+	cout << "length:" << length << " breath:" << breadth << " height:"
+			<< breadth << endl;
+	count++;
+	index = count;
+	cout << "Box " << index << " is being created" << endl;
+	length = len;
+	breadth = bre;
+	height = hei;
+}
 
+Box::Box(Box& box) {
+	count++;
+	index = count;
+	cout << "Box copy constructor, Box " << index << " created" << endl;
 }
 
 Box::~Box() {
-	cout << ">>> Box is being deleted <<<" << endl;
+	cout << "Box " << index << " is being deleted, reference:" << this << endl;
+}
+
+Box functionBoxNoRef(Box box) {
+	cout << "functionBoxNORef returning" << endl;
+	return box;
+}
+
+Box* functionBoxRef(Box* pBox) {
+	cout << "functionBoxNORef returning" << endl;
+	return pBox;
 }
 
 class Line {
@@ -204,14 +247,15 @@ int Line::getLengt() {
 	return *ptr;
 }
 
-//void Line::checkLine(Line line) {
-//	cout << "Line reference " << &line << endl;
-//}
 void checkLine(Line line) { //transfer by value, this should use copy constructor
 	cout << "Line reference " << &line << endl;
+	cout << "Length of the line " << line.getLengt() << endl;
+
 }
 void checkLineRef(Line &line) { //transfer by reference, no copy constructor
 	cout << "Line reference " << &line << endl;
+	cout << "Length of the line " << line.getLengt() << endl;
+
 }
 
 void displayLine(Line &obj) { //this does not initiate copy constructor
@@ -301,16 +345,57 @@ public:
 	}
 
 };
+
+void message()           // Global function ::message()
+{
+	std::cout << "Within Global function ::message()\n";
+}
+
+namespace A {
+using namespace std;
+// Names of std are visible here
+void message()       // Function A::message()
+{
+	cout << "Within function A::message()\n";
+}
+}
+
+namespace B {
+using std::cout;
+// Declaring cout of std.
+void message(void);   // Function B::message()
+}
+void B::message(void)    // Defining B::message()
+		{
+	cout << "Within function B::message()\n";
+}
+
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
 	bool execute = false;
+	bool hello = execute;
+	bool pointersVsArrays = execute;
+	bool stringHandling = execute;
+	bool structConstructor = execute;
+	bool constructor = execute;
+	bool referencesAndPointers = execute;
+	bool classesAndObjects = execute;
+	bool objectsCopyConstructor = execute;
+	bool objectsConstructionDestructing = execute;
+	bool operatorOverloading = execute;
+	bool initializationLists = execute;
+	bool inheritance = execute;
+	bool polymorphism = execute;
+	bool constClassesconstPointersAndMemberFunctions = execute;
+	bool transferByValueByReference = true;
+	bool namespaces = execute;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
 	cout << version.str() << endl;
 
-	if (execute) {
+	if (hello) {
 		cout << endl << ">>> Console input test <<<" << endl;
 		cout << "Enter your name: " << flush;
 		string input;
@@ -318,7 +403,7 @@ int main() {
 		cout << " Hello " << input << endl;
 	}
 
-	if (execute) {
+	if (pointersVsArrays) {
 		cout << endl << ">>> Pointers vs Arrays <<<" << endl;
 		int var[MAX] = { 10, 100, 200 };
 		int *ptrArray;
@@ -355,7 +440,7 @@ int main() {
 		}
 	}
 
-	if (execute) {
+	if (stringHandling) {
 		cout << endl << "!!!String Handling!!!" << endl;
 		char c[] = "Some stupid string";
 		int num[] = { 1, 2, 3, 5, 7 };
@@ -377,7 +462,7 @@ int main() {
 		cout << *(num + 1) << endl;
 	}
 
-	if (execute) {
+	if (structConstructor) {
 		cout << endl << "!!!Struct Constructor!!!" << endl;
 		struct DemoStruct demoStruct1;
 		struct DemoStruct demoStruct2(11, 12.3);
@@ -390,7 +475,7 @@ int main() {
 		cout << "DemoStruct3 double: " << demoStruct3.someDouble << endl;
 	}
 
-	if (execute) {
+	if (referencesAndPointers) {
 		cout << endl << ">>> References and pointers<<<" << endl;
 		//You cannot have NULL reference
 		//Once a reference is initialized to an object, it cannot be changed to refer
@@ -425,7 +510,7 @@ int main() {
 		cout << "Reference  rb " << rb << endl;
 	}
 
-	if (execute) {
+	if (classesAndObjects) {
 		cout << endl << ">>> Classes & Objects <<<" << endl;
 		Box box1;
 		Box box2;
@@ -445,7 +530,7 @@ int main() {
 		cout << "Volume of Box3 is " << box3.getVoume() << endl;
 	}
 
-	if (execute) {
+	if (objectsCopyConstructor) {
 		cout << endl << ">>> Classes & Objects - Copy constructor <<<" << endl;
 		Line line1(10);
 		Line line2 = line1;	//this also calls copy constructor
@@ -454,7 +539,7 @@ int main() {
 		displayLine(line2);
 	}
 
-	if (execute) {
+	if (objectsConstructionDestructing) {
 		cout << endl << "!!!Class constructing/destructing!!!" << endl;
 		cout << ">> new Temp" << endl;
 		//ovdje se u "istom" trenutku temp i deklarira i incijalizira,
@@ -475,7 +560,7 @@ int main() {
 
 	}
 
-	if (true) {
+	if (operatorOverloading) {
 		cout << endl << "!!!Operator overloading!!!" << endl;
 		cout << ">> create new Temp" << endl;
 		//ovdje se u "istom" trenutku temp i deklarira i incijalizira,
@@ -502,7 +587,7 @@ int main() {
 
 	}
 
-	if (true) {
+	if (initializationLists) {
 		cout << endl << "!!!Using intialization lists to initialize fields!!!"
 				<< endl;
 		cout << ">> create new Temp with initialization list" << endl;
@@ -511,7 +596,7 @@ int main() {
 		cout << ">> temp.value after construction " << temp.getValue() << endl;
 	}
 
-	if (execute) {
+	if (inheritance) {
 		cout << endl << ">>> Inheritance - Multiple inheritance <<<" << endl;
 		Rectangle rect;
 		Rectangle *ptrRec = &rect;
@@ -525,7 +610,7 @@ int main() {
 		cout << "Total paint cost: " << rect.getCost(area) << endl;
 	}
 
-	if (execute) {
+	if (polymorphism) {
 		cout << endl << ">>> Polymorphism <<<" << endl;
 		Shape *shape;
 		Rectangle rectangle(10, 7);
@@ -540,8 +625,10 @@ int main() {
 		rectangle.area();
 	}
 
-	if (execute) {
-		cout << endl << ">>> Const classes and methods <<<" << endl;
+	if (constClassesconstPointersAndMemberFunctions) {
+		cout << endl
+				<< ">>> Const classes , pointers to const classes and member functions <<<"
+				<< endl;
 
 		Exam1 nonConstClass;
 		const Exam1 constClass;
@@ -552,15 +639,45 @@ int main() {
 		constClass.funct2();
 	}
 
-	if (execute) {
+	if (transferByValueByReference) {
 		cout << endl << ">>> Transfer by value and transfer by reference <<<"
 				<< endl;
 		Line line3(11);
 		Line line4(12);
+		cout << "display line with reference ....." << endl;
 		displayLine(line3);
+		cout << "display line with reference ....." << endl;
 		displayLine(line4);
+		cout << "check line without reference ...." << endl;
 		checkLine(line3);
+		cout << "check line with reference ...." << endl;
 		checkLineRef(line3);
+		cout << " end of function ...." << endl;
+
+		cout << endl << "Making a Box" << endl;
+		Box box;
+		cout << " Calling functionBoxNoRef ...." << endl;
+		functionBoxNoRef(box);
+		cout << " Calling functionBoxRef ...." << endl;
+		functionBoxRef(&box);
+		cout << ">>> End of transfer by Reference <<<" << endl;
+	}
+
+	if (constructor) {
+		cout << endl << ">>> Constructor: initial values <<<" << endl;
+		Box box(3.0, 4.0, 8.0);
+		box.printBox();
+	}
+
+	if (namespaces) {
+		cout << endl << ">>> Namespaces:  <<<" << endl;
+		using B::message;
+		// Function name without braces!
+		A::message();
+		message();           // ::message() is hidden because
+							 // of the using-declaration.
+		::message();         // Global function
+
 	}
 
 	cout << endl << "exiting main" << endl;

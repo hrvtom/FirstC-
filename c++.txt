@@ -1,0 +1,640 @@
+>>>>
+variable definition
+	int    i, j, k;
+	char   c, ch;
+
+For definition without an initializer: variables with static storage duration are implicitly initialized with NULL
+(all bytes have the value 0); the initial value of all other variables is undefined.
+
+variable initialization
+	byte z = 22;                // definition and initializes z. 
+	byte b;                     // definition b
+	b = 33;                     // initialization b
+	char x = 'x';               // the variable x has the value 'x'.
+	float x(1.875f);
+
+When a local variable is defined, it is not initialized by the system, you must initialize it yourself.
+The initial value for any local variables not explicitly initialized will have an undefined initial value.
+Global variables not explicitly initialized are initialized automatically by the system when you define them as follows:
+	int     0
+	char    '\0'
+	float   0
+	double  0
+	pointer NULL
+
+>>>>>
+Constant creation
+The "const" keyword is used to create a "read only" variable. It defines constant that cannot be modified and must be
+initialized during its definition.
+
+	const double pi = 3.1415947;
+The value of pi cannot be modified by the program. 
+
+	#define Score 5000
+The constant does not have a type such as int or char.
+The #define directive enables a simple text substitution that replaces every instance of Score in the code with 5000.
+
+Constants are r-values but cannot be l-values. 
+
+>>>>>
+If statement
+
+In C++, the value 0 also is considered false and any other value is true. 
+	if (!x) 
+	if (x == 0) 
+Both statements are true when x equals 0. The second statement is somewhat easier to comprehend. 
+
+You can define and initialize a variable within an if statement.
+The expression is true if converting the variable's value to a bool type yields true.
+The variable is available within the if statement.
+	if( int x = func() ) 
+	{ 
+	. . . // Here to work with x. 
+	}           
+The return value of the function, func(), is used to initialize the variable x.
+If this value is not 0, the statements in the next block are executed.
+The variable x no longer exists after leaving the if statement. 
+
+>>>>>
+switch
+
+The switch statement compares the value of one expression with multiple constants.
+	switch( expression ) 
+	{ 
+		case const1: [ statement ] 
+							[ break; ] 
+		case const2: [ statement ] 
+							[ break; ] 
+		. 
+		. 
+		. 
+		[default:  statement ] 
+	} 
+First, the expression in the switch statement is evaluated.
+It must be an integral type.
+The result is then compared to the constants, const1, const2, ..., in the case labels.
+The constants must be different and can only be integral types including boolean values and character constants. 
+
+>>>>>
+for loop - a moze i ovako
+	for (int x = 0, y = 0; x < 10; x++, y++) 
+	{ 
+		std::cout << x * y << "\n"; 
+	}
+
+	for( expression1; expression2; expression3 ) 
+      statement 
+		expression1 is executed first and only once to initialize the loop.
+		expression2 is the controlling expression, which is always evaluated prior to executing the loop body
+		if expression2 is false, the loop is terminated
+		if expression2 is true, the loop body is executed. Subsequently, the loop is reinitialized by executing expression3 and expression2 is re-tested. 
+Any of the three expressions in a for statement can be omitted.
+You must type at least two semicolons. The shortest loop header is therefore:
+	for(;;) 
+
+>>>>>
+for each
+
+The foreach has two sections separated by a colon : instead of three separated by semicolons.
+The first section is a variable that will hold an element of the array. The second is the name of the array. 
+	int production[] = { 1, 6, 8, 4, 3 };
+	for (int year : production)
+	{
+		std::cout << "Output: " << year << std::endl;
+	}
+
+>>>>>
+auto-typed variables
+The "auto" keyword makes C++ to infer type based on the value initially assigned to it. 
+	auto index = 3; 
+	auto multiple = 2.25F; 
+same as:
+	int index = 3; 
+	float multiple = 2.25F; 
+multiple value assignement
+	auto a = 86, b = 75, c = 309; 
+	
+>>>>>
+Declaration,definition,initialization
+
+A variable declaration is useful when you are using multiple files and you define your variable in one of the files
+which will be available at the time of linking of the program. You will use extern keyword to declare a variable at
+any place. Though you can declare a variable multiple times in your C++ program, but it can be defined only once in
+a file, a function or a block of code.
+
+extern int d = 3, f = 5;    // declaration of d and f. 
+int d = 3, f = 5;           // definition and initializing d and f. 
+byte z = 22;                // definition and initializes z. 
+char x = 'x';               // the variable x has the value 'x'.
+
+>>>>
+Operator  - Address Operator
+
+You can use the address-of operator & to get variable memory address. 
+
+>>>>
+Array
+
+	int my_array[10] = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+	int my_array[] = { 10, 20, 30, 40, 50 }; 
+	const int size = sizeof(my_array) / sizeof(my_array[0]);
+	
+>>>>
+Fuctions without arguments
+
+If a function does not expect an argument, the function prototype must be declared as void or empty braces. 
+	int rand( void );
+	or
+	int rand(); 
+
+>>>>
+Prototype
+
+The prototype is the declaration of the function and describes only the formal interface of that function.
+You can omit parameter names from the prototype. 
+
+>>>>
+Default Function Parameters
+
+If the function prototype declares a default value for a parameter, the function can be called without that parameter. 
+If a parameter does not have a default value, no previous parameter may have a default value. 
+
+	permitted
+	long my_function(int x, int y, int z = 1, int t = 2000); 
+	not permitted
+	long my_function(int x, int y, int z = 1, int t);
+	
+>>>>
+Auto-Typed return values
+
+To make a function's return type determined by deduction, use "auto" where the return type is specified, as in this simple function:
+	auto subtract(int x, int y) 
+	{ 
+		return x - y; 
+	} 
+
+>>>>
+Function overloading
+
+In C++, more than one function can have the same name as long as there are differences in their arguments.
+The functions must have different data types for parameters, a different number of parameters, or both.
+The return types for overloaded functions do not factor into whether they are different.
+You can't overload function by making the return different, however.
+
+>>>>
+Function Inline
+
+If a C++ function is declared with the keyword "inline", the compiler copies the code from the inline function directly into
+the place where the function was called.
+The inline keyword is used in the function prototype:
+	inline int double(int); 
+The function itself does not change:
+	int double(int target) 
+	{ 
+		return 2 * target; 
+	} 
+Only used for some simple functions
+
+>>>>
+Function Lambda expressions
+
+A lambda expressions create inline anonymous functions. 
+	auto my_lambda = [](){ std::cout << "this is a test!" << std::endl; }; 
+	my_lambda();
+When a lambda expression has no arguments, the parentheses can be left out of the expression.
+	auto my_lambda = []{ std::cout << "this is a test!" << std::endl; };
+The lambda expression can have one or more arguments, which are specified within the parenthesis marks after the
+[ ] square brackets.
+	auto multiply = [](int x, int y){ std::cout << "Total: " << x * y << std::endl; }; 
+	multiply(5, 5);
+The expression can return a value by specifying its return type (or auto) after a "->" operator. 
+	auto multiply = [](int x, int y) -> int { return x * y; }; 
+	int sum = multiply(7, 17);
+To reference the outside variables use [ ] square brackets, which are called the capture block.
+List the variables inside the [ and ] brackets separated by commas.
+	int x = 7; 
+	auto multiply = [x](int y) -> int { return x * y; }; 
+	int sum = multiply(17); 
+	
+>>>>
+Class Declaratin vs Class Definitions
+Declaration (usualin in .h or .hpp file)
+	class Cart 
+	{ 
+	public: 
+		int speed; 
+		int wheelSize;
+		ing getSpeed();
+		pedal(); 
+		brake(); 
+	}; 
+Definition (Usually in .cpp file) defining declared constructors and methods.
+	int Cart::getSpeed() 
+	{ 
+		return speed; 
+	}
+
+>>>>
+Organizing Class Declarations and Functions Definitions
+
+You can make member functions inline. The keyword inline appears before the return value, as in this example:
+	inline int Cart::getSpeed() 
+	{ 
+		return speed; 
+	} 
+You can put the definition of a function in the declaration of the class, which automatically makes that function inline.
+Here's an example:
+	class Cart 
+	{ 
+	public: 
+		int getSpeed() const { return speed; } 
+		void setSpeed(int newSpeed); 
+	}; 
+
+>>>>
+A function that sets or gets the value of a private member variable is called an accessor.
+Other classes must call the accessor instead of working directly with the variable. 
+
+>>>>
+"const"
+
+    const int Constant1=96; 
+will create an integer constant, unimaginatively called ‘Constant1’
+It also works with pointers but one has to be careful where ‘const’ is put as that determines whether the pointer or
+what it points to is constant. For example,
+    const int * Constant2 
+declares that Constant2 is a variable pointer to a constant integer and
+    int const * Constant2
+is an alternative syntax which does the same,
+If you declare a pointer to a const object, the only functions that you can call with that pointer are const functions.
+When you declare an object to be const, you are declaring that the "this" pointer is a pointer to a const object.
+    int * const Constant3
+declares that Constant3 is constant pointer to a variable integer and
+    int const * const Constant4
+declares that Constant4 is constant pointer to a constant integer. Basically ‘const’ applies to whatever is on its immediate left
+(other than if there is nothing there in which case it applies to whatever is its immediate right).
+
+	void myfunc( const char x );
+	void myfunc( const char *x );
+A pointer that is defined as const in the parameter declarations, the function code will not modify what it points to.
+Basically, you can use the pointer and it pretty much functions as a "read-only". 
+	int myfunc() const;
+This is illegal unless it's inside a class declaration - const member functions prevent modification of any class member.
+The example, on a C++ member function, means that the contents of the object won't be changed by the call,
+it basically means the method cannot modify the class instance
+(i.e. the state of the instance before and after calling instance.myfunc() will be the same).
+	int myclass::myfunc() const
+	{
+		// do stuff that leaves members unchanged
+	}
+	
+	
+>>>>
+Pointers to memeber functions
+pFunc points to a member function of the class Shape, which takes two integers and returns void: 
+	void (Shape::*pFunc)(int, int);
+
+	void (Mammal::*pFunc)() const = 0; // pFunc is pointer to no argument function with void return type
+	.
+	.
+	pFunc = &Mammal::speak;  // both "speak" and "move" are no argument functions wit "void" return type
+	or
+	pFunc = &Mammal::move;
+	.
+	.
+	(ptr->*pFunc)()
+
+>>>>
+Pointers to member functions can be stored in an array. 
+	typedef void (Dog::*PDF)() const;
+	.
+	PDF dogFunctions[maxFuncs] = 
+           {   &Dog::speak, 
+               &Dog::move, 
+               &Dog::eat, 
+               &Dog::growl, 
+               &Dog::whimper, 
+               &Dog::rollOver, 
+               &Dog::playDead 
+        }; 
+		.
+		pDog = new Dog; 
+        (pDog->*dogFunctions[method - 1])(); 
+
+>>>>
+Default Constructors/Destructors
+You can set an object up without specifying parameters:
+	Cart shoppingCart; 
+	Rectangle rect; 
+This calls the default constructor of the class, which is a constructor with no parameters.
+If you did not declare a constructor for the class, the compiler creates a default constructor for you.
+The default constructor the compiler adds takes no action; it is a constructor with no parameters whose body was empty.
+You can define it yourself or be provided one as a default from the compiler.
+If you define any constructor, the compiler does not provide a default constructor for you.
+In that case, if you want a default constructor (with no parameter), you must define it yourself.
+Destructors take no parameters and have no return value.
+If you did not define a destructor, the compiler provides an empty destructor for you.
+
+Constructors can be overloaded.
+You can't overload destructors. 
+
+A member variable can be set during the initialization or by assigning it a value in the body of the constructor.
+To assign values in a constructor's initialization, put a colon after the closing parentheses of the constructor's
+parameter list.
+After the colon, list the name of a member variable followed by a pair of parentheses.
+Inside the parentheses, put an expression that initializes the member variable.
+If more than one variable is being set in this manner, separate each one with a comma.
+
+	Cart::Cart(): 
+	speed(5), 
+	wheelSize(12) 
+	{ 
+		// body of constructor 
+	} 
+
+>>>>
+Copy Constructor
+
+The copy constructor is called every time a copy of an object is made.
+When you pass an object by value, a temporary copy of that object is made.
+If the object is a user-defined object, the class's copy constructor is called.
+All copy constructors take one parameter: a reference to an object of the same class.
+
+	Cart(const Cart &trike); 
+
+The default copy constructor copies each member variable from the object passed as a parameter to the member variables of the new object.
+This is called a shallow copy. 
+A shallow copy copies the exact values of one object's member variables into another object.
+Pointers in both objects end up pointing to the same memory.
+A deep copy copies the values allocated on the heap to newly allocated memory. 
+
+	Cart::Cart(const Cart& rhs) 
+	{ 
+		speed = new int; 
+		*speed = rhs.getSpeed(); 
+	} 
+>>>>
+Assign built-in type to custom object
+
+The following code creates a conversion operator: a constructor that takes an int and produces a Counter object. 
+	class Counter{
+	public: 
+		Counter(); 
+		Counter(int newValue); 
+	.
+	.
+	private:
+		int value;
+	}
+
+	Counter::Counter(): value(0) 
+	{} 
+	
+	Counter::Counter(int newValue): value(newValue) 
+	{} 
+	
+	int main() { 
+		int beta = 5; 
+		Counter alpha = beta; 
+		return 0; 
+	}
+	
+The constructor is overloaded to take an int. The effect of this constructor is to create a Counter out of an int. 
+Given this constructor, the compiler knows to call it when an integer is assigned to a Counter object. 
+
+>>>>
+Namespaces
+
+Elements belonging to a namespace can be referenced directly by name within the namespace.
+To reference an element from outside of the namespace, supply the namespace by adding the scope resolution operator ::
+before the element name.
+	myLib::count = 7;     // Outside of myLib 
+This allows you to distinguish between identical names in different namespaces.
+You can use the scope resolution operator :: to reference global names declared outside of any namespaces.
+To do so, simply omit the name of the namespace.
+You can access a global name hidden by an identical name defined in the current namespace using the following.
+	::demo();  // Not belonging to any namespace 
+namespaces do not need to be defined contiguously.
+You can reopen and expand a namespace you defined previously at any point in the program
+namespaces can be nested, and you can define a namespace within another namespace. 
+
+	namespace myLib 
+	{ 
+		int count; 
+		double calculate(double, int); 
+		// . . . 
+	}
+
+You can access to the elements of a namespace via a "using" declaration or "using" directive.
+In this case, you do not need to repeatedly quote the namespace.
+"using" Declarations
+A using declaration makes an identifier from a namespace visible in the current scope.
+	using myLib::calculate;    // Declaration 
+You can then call the function calculate() from the myLib namespace.
+	double erg = calculate( 3.7, 5);  
+"using" Directive
+The using directive allows you to import all the identifiers in a namespace.
+	using namespace myLib; 
+This statement allows you to reference the identifiers in the myLib namespace directly.
+If myLib contains an additional namespace and a using directive, this namespace is also imported. 
+
+>>>>
+Storage Classes
+
+The following storage class specifiers can be used
+	extern		use extern to reference global variables defined in the another file. In this way we tell the compiler that
+				we are using the global variable not a new one. 
+	static
+	auto
+	register 
+
+You can define an object with:
+	Scope              	Meaning
+	block scope         The object is only available in the code block in which it was defined.
+	file scope			The object can be used within a single module. Only the functions within this module can 
+						reference the object.
+	program scope		The object is available throughout the program. These objects are often referred to as global.
+
+>>>>
+static storage class
+
+The static storage class instructs the compiler to keep a local variable in existence during the life-time of
+the program instead of creating and destroying it each time it comes into and goes out of scope. Therefore,
+making local variables static allows them to maintain their values between function calls.
+
+The static modifier may also be applied to global variables. When this is done, it causes that variable's scope
+to be restricted to the file in which it is declared.
+
+In C++, when static is used on a class data member, it causes only one copy of that member to be shared by all
+objects of its class.
+
+class Box {
+public:
+	static int count;
+	.
+	.
+};
+
+int Box::count = 0;
+
+>>>>
+Characters
+
+      void print(char* c) { // ispisule cijeli char field
+         cout << "Printing character: " << c << endl;
+      }
+
+void printString(char* c, int i) {// ispisuje char filed od +i indexa
+	cout << (c + i) << endl;
+}
+
+
+void printCharacter(char* c, int i) { //ispisuje character na +i indexu
+	cout << *(c + i) << endl;
+}
+
+
+>>>>
+NULL pointer
+It is always a good practice to assign the pointer NULL to a pointer variable in case you do not have exact address
+to be assigned. This is done at the time of variable declaration. A pointer that is assigned NULL is called
+a null pointer.
+
+this is possible: - only at variable declaration
+	int *pAge = nullptr; 
+this is possible too:
+	itn *pAge = 0
+The constant 0 remains valid as a null pointer value, for reasons of backward compatibility. 
+this is not possible:
+	int *pAge;
+		.
+		.
+	*pAge = nullptr // this is not variable declaration
+this is not possible too:
+	int *pAge = nullptr; 
+	.
+	.
+	if(*pAge){   //this doesn't work
+	}
+but this is possible:
+	int *pAge;
+	.
+	.
+	pAge = NULL;
+	.
+	.
+	if(pAge){
+	}
+
+
+>>>>
+Pointers vs Arrays
+
+A pointer that points to the beginning of an array can access that array by using either pointer arithmetic
+or array-style indexing.
+
+int  var[MAX] = {10, 100, 200};
+      *var = i;    // This is a correct syntax
+      var++;       // This is incorrect.
+
+It is perfectly acceptable to apply the pointer operator * to var but it is illegal to modify var value.
+The reason for this is that var is a constant that points to the beginning of an array and can not
+be used as l-value.
+
+*(var + 2) = 500;
+Because an array name generates a pointer constant, it can still be used in pointer-style expressions,
+as long as it is not modified.
+
+>>>>>
+Virtual function
+
+      // pure virtual function
+      virtual int area() = 0;
+
+The = 0 tells the compiler that the function has no body and above virtual function will be called pure virtual function.
+It may be redefined in a derived class to suit the objects of that class.
+
+
+>>>>>
+References
+References are usually used for function argument lists and function return values.
+References are merely alias. 
+A pointer is an object.
+
+	//You cannot have NULL reference
+	//Once a reference is initialized to an object, it cannot be changed to refer
+	//to another object. Pointers can be pointed to another object at any time.
+	//A reference must be initialized when it is created. Pointers can be
+	//initialized at any time
+	int a;
+	double b;
+	int& ra = a;
+	double& rb = b;
+
+          pointer                a,ra
+          -------                 ---
+          |     |---------------->| |
+          -------                 ---
+
+inline T const& Max (T const& a, T const& b)  { 
+   return a < b ? b:a; 
+} 
+
+
+>>>>>
+accessing members
+
+Structure
+To access any member of a structure, we use the member access operator (.)
+	structure.member
+
+To access the members of a structure using a pointer to that structure, you must use the -> operator
+	structure_pointer->member
+
+Class
+A pointer to a C++ class is done exactly the same way as a pointer to a structure and to access members of a pointer to a class
+you use the member access operator -> operator, just as you do with pointers to structures. Also as with all pointers,
+you must initialize the pointer before using it.
+
+	my_pointer->GetAge();
+	or
+	(*my_pointer).GetAge();
+
+>>>>>
+Constructing
+
+	Rectangle(int a = 0, int b = 0) :Shape(a, b) {}
+
+struct DemoStruct {
+	int someInt;
+	double someDouble;
+	//struct Constructor
+	DemoStruct(int i, double d) :
+			someInt(i), someDouble(d) {
+	}
+};
+
+>>>>>
+Segmantation fault
+access to released objects
+
+	Temp* someF(){
+		Temp temp;
+		.
+		.
+		return &temp;
+	}
+	or
+	char *p = NULL;
+	{
+		char c;
+		p = &c;
+	}
+If temp is returned as a pointer(*temp), the temp object will be destroyed at the
+end of this method, and the caller will end up wit the poniter to object that
+doesn't exist any more. this causes Segmentation fault.
+solution is to create temp object with help of new Temp(), this object is stored in heap memory
+and must be destroyed manually.
+Same is valid for *p
+	
+	
