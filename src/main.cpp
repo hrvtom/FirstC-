@@ -273,9 +273,18 @@ protected:
 	int width;
 	int height;
 public:
-	Shape(int a = 0, int b = 0) {
+	Shape() {
+		cout << "Shape() consturctor" << endl;
+		width = 10;
+		height = 10;
+	}
+	Shape(int a, int b) {
+		cout << "Shape(int,int) consturctor" << endl;
 		width = a;
 		height = b;
+	}
+	~Shape() {
+		cout << "Shape() desturctor" << endl;
 	}
 	void setWidth(int w) {
 		width = w;
@@ -302,6 +311,10 @@ class Rectangle: public Shape, public PaintCost {
 public:
 	Rectangle(int a = 0, int b = 0) :
 			Shape(a, b) {
+		cout << "Rectangle(int,int) consturctor" << endl;
+	}
+	~Rectangle() {
+		cout << "Rectangle() desturctor" << endl;
 	}
 	int getArea() {
 		return (width * height);
@@ -315,8 +328,19 @@ public:
 
 class Triangle: public Shape {
 public:
-	Triangle(int a = 0, int b = 0) :
+	Triangle(int a, int b) :
 			Shape(a, b) {
+		cout << "Triangle(int,int) consturctor" << endl;
+	}
+
+	Triangle(int a) :
+			Shape() {
+		cout << "Triangle(int) consturctor" << endl;
+		setWidth(a);
+		setHeight(a);
+	}
+	~Triangle() {
+		cout << "Triangle() desturctor" << endl;
 	}
 	int area() {
 		cout << "Triangle class area :" << endl;
@@ -370,6 +394,15 @@ void B::message(void)    // Defining B::message()
 	cout << "Within function B::message()\n";
 }
 
+bool inputFromCommandLine(string& name, long& number) {
+	cout << "INput client data!" << endl << "Name: ";
+	if (!getline(cin, name))
+		return false;
+	cout << "Number: ";
+	if (!(cin >> number))
+		return false;
+	return true;
+}
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
@@ -382,14 +415,15 @@ int main() {
 	bool referencesAndPointers = execute;
 	bool classesAndObjects = execute;
 	bool objectsCopyConstructor = execute;
-	bool objectsConstructionDestructing = execute;
+	bool objectsConstructionDestructing = true;
 	bool operatorOverloading = execute;
 	bool initializationLists = execute;
 	bool inheritance = execute;
-	bool polymorphism = execute;
+	bool polymorphism = true;
 	bool constClassesconstPointersAndMemberFunctions = execute;
-	bool transferByValueByReference = true;
+	bool transferByValueByReference = execute;
 	bool namespaces = execute;
+	bool commandLineInput = execute;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
@@ -558,6 +592,10 @@ int main() {
 //		cout << ">> New Temp name " << temp.getName() << endl;
 //		cout << ">> New Temp address " << &temp << endl;
 
+		Rectangle rec(20, 18);
+		Triangle tri(14);
+		rec.area(); //this is virtual function
+		tri.area(); //this is virtual function
 	}
 
 	if (operatorOverloading) {
@@ -617,10 +655,10 @@ int main() {
 		Triangle triangle(10, 5);
 
 		shape = &rectangle;
-		shape->area();
+		shape->area(); //this is virtual method
 
 		shape = &triangle;
-		shape->area();
+		shape->area(); //this is virtual method
 
 		rectangle.area();
 	}
@@ -677,6 +715,19 @@ int main() {
 		message();           // ::message() is hidden because
 							 // of the using-declaration.
 		::message();         // Global function
+
+	}
+
+	if (commandLineInput) {
+		cout << endl << ">>> Input form command line:  <<<" << endl;
+		string name;
+		long number;
+		if (inputFromCommandLine(name, number)) {
+			cout << "Name is: " << name << endl;
+			cout << "Number is: " << number << endl;
+		} else {
+			cout << "Some input was wrong";
+		}
 
 	}
 

@@ -274,10 +274,25 @@ declares that Constant3 is constant pointer to a variable integer and
 declares that Constant4 is constant pointer to a constant integer. Basically ‘const’ applies to whatever is on its immediate left
 (other than if there is nothing there in which case it applies to whatever is its immediate right).
 
+Even more useful is a pointer (constant or otherwise) to a ‘const’ value. This is useful for returning constant strings
+and arrays from functions which, because they are implemented as pointers, the program could otherwise try to alter and crash.
+Instead of a difficult to track down crash, the attempt to alter unalterable values will be detected during compilation.
+(this is valid because of some C shit and how C retrnes strings and arrays)
+    char *Function1()
+    { return “Some text”;}
+then the program could crash if it accidentally tried to alter the value doing
+    Function1()[1]=’a’;
+whereas the compiler would have spotted the error if the original function had been written
+    const char *Function1()
+    { return "Some text";}
+
 	void myfunc( const char x );
 	void myfunc( const char *x );
 A pointer that is defined as const in the parameter declarations, the function code will not modify what it points to.
 Basically, you can use the pointer and it pretty much functions as a "read-only". 
+	void Subroutine4(big_structure_type const &Parameter1);
+will cause the variable to be passed without copying but stop it from then being altered.
+
 	int myfunc() const;
 This is illegal unless it's inside a class declaration - const member functions prevent modification of any class member.
 The example, on a C++ member function, means that the contents of the object won't be changed by the call,
@@ -291,6 +306,18 @@ it basically means the method cannot modify the class instance
 	
 >>>>
 Pointers to memeber functions
+
+A function name is a constatnt pointer to the function.
+You can declare a pointer variable that points to a function and to invoke the function using that pointer
+The declaration of a function pointer always includes the return type and parentheses indication the type of the parameters
+	void square(int&, int&);
+	void (*pFunc)(int&,int&);
+	.
+	.
+	pFunct = square;
+You can declare an array of pointers to the functions
+		vois (*pFuncArray[amxArray])(int&,int&)
+		
 pFunc points to a member function of the class Shape, which takes two integers and returns void: 
 	void (Shape::*pFunc)(int, int);
 
@@ -558,8 +585,9 @@ It may be redefined in a derived class to suit the objects of that class.
 >>>>>
 References
 References are usually used for function argument lists and function return values.
-References are merely alias. 
-A pointer is an object.
+Pointers are variables that hold the address of another object.A reference is alias for an object that already exists. 
+Defining a reference does not occupy additional memory.
+If you ask a reference(& operator) for its address, it returns the address of its target. 
 
 	//You cannot have NULL reference
 	//Once a reference is initialized to an object, it cannot be changed to refer
@@ -580,7 +608,28 @@ inline T const& Max (T const& a, T const& b)  {
    return a < b ? b:a; 
 } 
 
+A reference aliasing a constant object must be a constant itself. It must be defined using the const keyword to avoid modifying
+the object by reference. 
+	const int& cref = a;
+The reference cref is said to be a read-only identifier.
+A read-only identifier can be initialized by a constant, in contrast to a normal reference: 
+	const double& pi = 3.1415927;
 
+The return type of a function can be a reference type.
+The function call then represents an object, and can be used just like an object.
+The object referenced by the return value must exist after leaving the function. !!!
+
+(in this case object exists after leaving the function because of "static", this is some c shit)
+	string& message()           // Reference! 
+	{ 
+		static string str ="Today only cold cuts!"; 
+		return str; 
+	}
+	
+	message() = "Let's go to the beer garden!"; 
+	message() += " Cheers!"; 
+	cout << "Length: " << message().length(); 
+	
 >>>>>
 accessing members
 
@@ -636,5 +685,128 @@ doesn't exist any more. this causes Segmentation fault.
 solution is to create temp object with help of new Temp(), this object is stored in heap memory
 and must be destroyed manually.
 Same is valid for *p
+
+>>>>>
+Operator overloading
+When you implement an operator for a class, you are overloading that operator.
+The most common way to overload an operator in a class is to use a member function.
+The function declaration takes this form:
+	returnType operatorsymbol(parameter list) 
+	{ 
+		// body of overloaded member function 
+	} 
+The name of the function is operator keyword followed by the operator symbol, such as + or ++.	The "returnType" is 
+the function's return type. The parameter list holds zero, one, or two parameters (depending on the operator). 
+
+	class Counter
+	{ 
+	public: 
+		Counter(); 
+		.
+		.
+		const Counter& operator++(); 
+		
+	private: 
+		int value; 
+	}; 
+
+	const Counter& Counter::operator++() 
+	{ 
+		++value; 
+		return *this; 
+	} 
 	
+The way to overload prefix and postfix operator is to include a "int" variable to the operator++() member function.
+The integer won't be used; it's just a signal that the function defines the postfix operator. The prefix operator changes
+a variable's value before returning it in expressions. The postfix operator returns the value before incrementing or
+decrementing it. To do this, in an overloaded member function, a temporary object must be created to hold the original value
+while the value of the original object is incremented. The temporary object is returned because the postfix operator requires
+the original value, not the incremented value.
+The temporary object must be returned by value and not by reference. Otherwise, it goes out of scope as soon as the function
+returns. 
+
+	const Counter& operator++();   // prefix 
+	const Counter operator++(int); // postfix 
+	.
+	.
+	const Counter& Counter::operator++() // prefix 
+	{ 
+		++value; 
+		return *this; 
+	} 
+ 
+	const Counter Counter::operator++(int) // postfix 
+	{ 
+		Counter temp(*this); 
+		++value; 
+		return temp; 
+	} 
+
+operator =
 	
+	class Cart 
+	{ 
+	public: 
+		Cart();  
+		// copy constructor and destructor use default 
+		int getSpeed() const { return *speed; } 
+		void setSpeed(int newSpeed) { *speed = newSpeed; } 
+		Cart operator=(const Cart&); 
+   
+	private: 
+		int *speed; 
+	}; 
+	
+	Cart Cart::operator=(const Cart& rhs) 
+	{ 
+		if (this == &rhs) 
+				return *this; 
+		delete speed;  //!!! why this
+		speed = new int;  //!!! why this
+		*speed = rhs.getSpeed(); 
+		return *this; 
+	} 
+
+>>>>>
+Inheritance _constructor
+
+class Mammal//from   w  ww.j a v  a  2 s.c o m
+{
+public:
+	// constructors 
+	Mammal();
+	Mammal(int age);
+	~Mammal();
+	.
+	.
+protected:
+	int age;
+	int weight;
+}
+
+class Dog : public Mammal
+{
+public:
+	// constructors 
+	Dog();
+	Dog(int age);
+	Dog(int age, int weight);
+	Dog(int age, int weight, int breed);
+	~Dog();
+	.
+	.
+private:
+	int breed;
+}
+
+Mammal::Mammal() : age(1), weight(5){std::cout << "Mammal constructor ...\n";}
+Mammal::Mammal(int age) : age(age), weight(5){}
+
+Dog::Dog() : Mammal(), breed(2){ std::cout << "Dog constructor ...\n"; }
+Dog::Dog(int age) : Mammal(age), breed(2){ std::cout << "Dog(int) constructor ...\n"; }
+Dog::Dog(int age, int newWeight) : Mammal(age), breed(2)
+{
+  weight = newWeight;
+  std::cout << "Dog(int, int) constructor ...\n";
+}
+
