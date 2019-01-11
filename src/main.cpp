@@ -293,7 +293,8 @@ public:
 		height = h;
 	}
 
-	virtual int area() { // this is like abstract method
+	virtual int area() { // this is like abstract method, actually it would be abstract if it has = 0.
+						 // but this way it polymorfe!?!?!
 		cout << "Parent class area :" << endl;
 		return 0;
 	}
@@ -403,6 +404,22 @@ bool inputFromCommandLine(string& name, long& number) {
 		return false;
 	return true;
 }
+
+class A1 {
+public:
+	void move(int step) {
+		cout << "A1 moved " << step << " steps." << endl;
+	}
+};
+
+class B1: public A1 {
+public:
+	void move(int step) {
+		cout << "B1 moved " << endl;
+		A1::move(step);
+	}
+};
+
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
@@ -415,15 +432,16 @@ int main() {
 	bool referencesAndPointers = execute;
 	bool classesAndObjects = execute;
 	bool objectsCopyConstructor = execute;
-	bool objectsConstructionDestructing = true;
+	bool objectsConstructionDestructing = execute;
 	bool operatorOverloading = execute;
 	bool initializationLists = execute;
 	bool inheritance = execute;
-	bool polymorphism = true;
+	bool polymorphism = execute;
 	bool constClassesconstPointersAndMemberFunctions = execute;
 	bool transferByValueByReference = execute;
 	bool namespaces = execute;
 	bool commandLineInput = execute;
+	bool overrideMemberFuction = true;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
@@ -728,6 +746,21 @@ int main() {
 		} else {
 			cout << "Some input was wrong";
 		}
+
+	}
+
+	if (overrideMemberFuction) {
+		cout << endl << ">>> Inheritance, override member fuction:  <<<"
+				<< endl;
+		A1 a;
+		B1 b;
+
+		cout << "A is moving" << endl;
+		a.move(3);
+		cout << "B is moving" << endl;
+		b.move(5);
+		cout << "B is moving again, only A part is moving" << endl;
+		b.A1::move(7);
 
 	}
 

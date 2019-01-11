@@ -87,7 +87,8 @@ for loop - a moze i ovako
 		expression1 is executed first and only once to initialize the loop.
 		expression2 is the controlling expression, which is always evaluated prior to executing the loop body
 		if expression2 is false, the loop is terminated
-		if expression2 is true, the loop body is executed. Subsequently, the loop is reinitialized by executing expression3 and expression2 is re-tested. 
+		if expression2 is true, the loop body is executed. Subsequently, the loop is reinitialized by executing
+			expression3 and expression2 is re-tested. 
 Any of the three expressions in a for statement can be omitted.
 You must type at least two semicolons. The shortest loop header is therefore:
 	for(;;) 
@@ -167,14 +168,19 @@ If a parameter does not have a default value, no previous parameter may have a d
 >>>>
 Auto-Typed return values
 
-To make a function's return type determined by deduction, use "auto" where the return type is specified, as in this simple function:
+To make a function's return type determined by deduction, use "auto" where the return type is specified,
+as in this simple function:
 	auto subtract(int x, int y) 
 	{ 
 		return x - y; 
 	} 
 
 >>>>
-Function overloading
+Function overloading/Overriding
+
+When you overload a member function, you create more than one function with the same name but with different signatures. 
+When you override a member function, you create a function in a derived class with the same name
+as a function in the base class and with the same signature. 
 
 In C++, more than one function can have the same name as long as there are differences in their arguments.
 The functions must have different data types for parameters, a different number of parameters, or both.
@@ -389,8 +395,8 @@ All copy constructors take one parameter: a reference to an object of the same c
 
 	Cart(const Cart &trike); 
 
-The default copy constructor copies each member variable from the object passed as a parameter to the member variables of the new object.
-This is called a shallow copy. 
+The default copy constructor copies each member variable from the object passed as a parameter to the member variables
+of the new object. This is called a shallow copy. 
 A shallow copy copies the exact values of one object's member variables into another object.
 Pointers in both objects end up pointing to the same memory.
 A deep copy copies the values allocated on the heap to newly allocated memory. 
@@ -809,4 +815,37 @@ Dog::Dog(int age, int newWeight) : Mammal(age), breed(2)
   weight = newWeight;
   std::cout << "Dog(int, int) constructor ...\n";
 }
+
+>>>>>
+Inheritance - overriden member function
+
+To access the overridden base member function, write the base name, followed by two colons, and then the function name.
+
+	void Dog::move() const 
+	{ 
+		std::cout << "Dog moves ...\n"; 
+		Mammal::move(3); 
+	}
+	
+	int main() 
+	{ 
+		Mammal bigAnimal; 
+		Dog fido; 
+		bigAnimal.move(2); 
+		fido.Mammal::move(6); 
+		return 0; 
+	}
+	
+>>>>>
+Pure virtual functions
+
+C++ can create abstract data types with pure virtual functions.
+
+A pure virtual function is a virtual function that must be overridden in the derived class.
+A virtual function is made pure by initializing it with 0, as in the following statement:
+	virtual void draw() = 0;
+Any class with one or more pure virtual functions is an abstract data type.You cannot instantiate an object of
+a abstract class (ADT). Any class that derives from an ADT inherits the pure virtual function, so it must override
+every pure virtual function if it wants to instantiate objects. Or the subclass will be an ADT too. 
+
 
