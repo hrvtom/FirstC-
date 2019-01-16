@@ -420,6 +420,63 @@ public:
 	}
 };
 
+class Fruit {
+public:
+	Fruit(){cout << "Fruit constructed\n";}
+	virtual ~Fruit(){cout << "Fruit destructed\n";}
+	virtual int getWeight() = 0;
+	virtual int getTaste() = 0;
+	virtual void draw() = 0;
+private:
+};
+
+void Fruit::draw(){
+	cout << "This is abstract Fruit"<< endl;
+}
+
+class Peach : public Fruit{
+public:
+	Peach() {cout << "Peach constructed\n";};
+	virtual ~Peach() {cout << "Peach destructed\n";};
+	int getWeight(){return 123;}
+	int getTaste() {return 7;}
+	void draw() {cout<<"This is Peach, followed by"<<endl; Fruit::draw();}	// although Fruit::draw() is defined, Peach still
+												// Peach still needs to implement draw() not to be abstract
+};
+
+class Apple : public Fruit{
+public:
+	Apple() {cout << "Apple constructed\n";}
+	virtual ~Apple(){cout << "Apple destructed\n";}
+	virtual int getWeight(){return 234;}
+	virtual int getTaste() {return 3;}
+	virtual string getColor(){return "red/yellow";}
+	void draw();
+};
+void Apple::draw(){
+	cout << "This is Apple followed by\n";
+	Fruit::draw();
+}
+
+class GreenApple : public Apple{
+public:
+	GreenApple(){
+		cout << "GreenApple constructed\n";
+	}
+
+	virtual ~GreenApple(){
+		cout << "GreenApple destructed\n";
+	}
+
+	int getWeight(){return 185;}
+	int getTaste() { return 4;}
+
+	string getColor() {
+		return "Green";
+	}
+};
+
+
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 
@@ -441,7 +498,8 @@ int main() {
 	bool transferByValueByReference = execute;
 	bool namespaces = execute;
 	bool commandLineInput = execute;
-	bool overrideMemberFuction = true;
+	bool overrideMemberFuction = execute;
+	bool virtualfunctions = true;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
@@ -761,6 +819,26 @@ int main() {
 		b.move(5);
 		cout << "B is moving again, only A part is moving" << endl;
 		b.A1::move(7);
+
+	}
+
+	if (virtualfunctions) {
+		cout << endl << ">>> Pure Virtual functions:  <<<"
+				<< endl;
+		Fruit* fruit;
+		fruit = new Peach();
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
+		fruit->draw();
+		fruit = new Apple();
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
+		cout << "Apple color: " << ((Apple*)fruit)->getColor() << endl;
+		fruit->draw();
+		fruit = new GreenApple();
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
+		cout << "Apple color: " << ((Apple*)fruit)->getColor() << endl;
+		fruit->draw();
+
+
 
 	}
 

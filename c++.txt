@@ -587,6 +587,16 @@ Virtual function
 The = 0 tells the compiler that the function has no body and above virtual function will be called pure virtual function.
 It may be redefined in a derived class to suit the objects of that class.
 
+Pure virtual functions
+C++ can create abstract data types with pure virtual functions.
+A pure virtual function is a virtual function that must be overridden in the derived class.
+A virtual function is made pure by initializing it with 0, as in the following statement:
+	virtual void draw() = 0;
+Any class with one or more pure virtual functions is an abstract data type.You cannot instantiate an object of
+a abstract class (ADT). Any class that derives from an ADT inherits the pure virtual function, so it must override
+every pure virtual function if it wants to instantiate objects. Or the subclass will be an ADT too. 
+If supperclass has pure virtual function, and this function is later on defined in superclass, subclass still needs to 
+implement pure virtual function, othervise subclass is stil abstract(koja glupost)
 
 >>>>>
 References
@@ -670,7 +680,7 @@ struct DemoStruct {
 };
 
 >>>>>
-Segmantation fault
+Segmentation fault
 access to released objects
 
 	Temp* someF(){
@@ -836,16 +846,6 @@ To access the overridden base member function, write the base name, followed by 
 		return 0; 
 	}
 	
->>>>>
-Pure virtual functions
 
-C++ can create abstract data types with pure virtual functions.
-
-A pure virtual function is a virtual function that must be overridden in the derived class.
-A virtual function is made pure by initializing it with 0, as in the following statement:
-	virtual void draw() = 0;
-Any class with one or more pure virtual functions is an abstract data type.You cannot instantiate an object of
-a abstract class (ADT). Any class that derives from an ADT inherits the pure virtual function, so it must override
-every pure virtual function if it wants to instantiate objects. Or the subclass will be an ADT too. 
 
 
