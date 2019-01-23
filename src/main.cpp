@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string.h> //Without this is OK but std::string used instead
+#include <string>
 
 using namespace std;
 
@@ -422,60 +422,301 @@ public:
 
 class Fruit {
 public:
-	Fruit(){cout << "Fruit constructed\n";}
-	virtual ~Fruit(){cout << "Fruit destructed\n";}
+	Fruit() {
+		cout << "Fruit constructed\n";
+	}
+	virtual ~Fruit() {
+		cout << "Fruit destructed\n";
+	}
 	virtual int getWeight() = 0;
 	virtual int getTaste() = 0;
 	virtual void draw() = 0;
 private:
 };
 
-void Fruit::draw(){
-	cout << "This is abstract Fruit"<< endl;
+void Fruit::draw() {
+	cout << "This is abstract Fruit" << endl;
 }
 
-class Peach : public Fruit{
+class Peach: public Fruit {
 public:
-	Peach() {cout << "Peach constructed\n";};
-	virtual ~Peach() {cout << "Peach destructed\n";};
-	int getWeight(){return 123;}
-	int getTaste() {return 7;}
-	void draw() {cout<<"This is Peach, followed by"<<endl; Fruit::draw();}	// although Fruit::draw() is defined, Peach still
-												// Peach still needs to implement draw() not to be abstract
+	Peach() {
+		cout << "Peach constructed\n";
+	}
+	;
+	virtual ~Peach() {
+		cout << "Peach destructed\n";
+	}
+	;
+	int getWeight() {
+		return 123;
+	}
+	int getTaste() {
+		return 7;
+	}
+	void draw() {
+		cout << "This is Peach, followed by" << endl;
+		Fruit::draw();
+	}	// although Fruit::draw() is defined, Peach still
+	// Peach still needs to implement draw() not to be abstract
 };
 
-class Apple : public Fruit{
+class Apple: public Fruit {
 public:
-	Apple() {cout << "Apple constructed\n";}
-	virtual ~Apple(){cout << "Apple destructed\n";}
-	virtual int getWeight(){return 234;}
-	virtual int getTaste() {return 3;}
-	virtual string getColor(){return "red/yellow";}
+	Apple() {
+		cout << "Apple constructed\n";
+	}
+	virtual ~Apple() {
+		cout << "Apple destructed\n";
+	}
+	virtual int getWeight() {
+		return 234;
+	}
+	virtual int getTaste() {
+		return 3;
+	}
+	virtual string getColor() {
+		return "red/yellow";
+	}
 	void draw();
 };
-void Apple::draw(){
+void Apple::draw() {
 	cout << "This is Apple followed by\n";
 	Fruit::draw();
 }
 
-class GreenApple : public Apple{
+class GreenApple: public Apple {
 public:
-	GreenApple(){
+	GreenApple() {
 		cout << "GreenApple constructed\n";
 	}
 
-	virtual ~GreenApple(){
+	virtual ~GreenApple() {
 		cout << "GreenApple destructed\n";
 	}
 
-	int getWeight(){return 185;}
-	int getTaste() { return 4;}
+	int getWeight() {
+		return 185;
+	}
+	int getTaste() {
+		return 4;
+	}
 
 	string getColor() {
 		return "Green";
 	}
 };
 
+class Data {
+public:
+	Data(int value) :
+			value(value) {
+	}
+	virtual ~Data() {
+		std::cout << "Deleting Data object with value: " << value << endl;
+	}
+	int compare(const Data&);
+	void show() {
+		std::cout << "Data value: " << value << endl;
+	}
+private:
+	int value;
+};
+
+int Data::compare(const Data& otherData) {
+	int result;
+	if (value < otherData.value) {
+		result = -1;
+	} else if (value > otherData.value) {
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
+
+class Dog {
+public:
+	Dog(int age) :
+			age(age) {
+	}
+	virtual ~Dog() {
+		std::cout << "Deleting Dog object age: " << age << endl;
+	}
+	int compare(const Dog&);
+	void show() {
+		std::cout << "This dog is " << age << "years old" << endl;
+	}
+private:
+	int age;
+};
+
+int Dog::compare(const Dog& otherDog) {
+	int result;
+	if (age < otherDog.age) {
+		result = -1;
+	} else if (age > otherDog.age) {
+		result = 1;
+	} else {
+		result = 0;
+	}
+	return result;
+}
+
+template<class T>
+class Node {
+public:
+	Node() {
+	}
+	virtual ~Node() {
+	}
+	virtual Node* insert(T* object) = 0;
+	virtual void show() = 0;
+};
+
+template<class T>
+class InternalNode: public Node<T> {
+public:
+	InternalNode(T* theObject, Node<T>* next);
+	virtual ~InternalNode() {
+		delete nextNode;
+		delete object;
+	}
+	virtual Node<T>* insert(T* object);
+	virtual void show() {
+		object->show();
+		nextNode->show();
+	}
+private:
+	T* object;
+	Node<T>* nextNode;
+};
+
+template<class T>
+InternalNode<T>::InternalNode(T* theObject, Node<T>* next) :
+		object(theObject), nextNode(next) {
+}
+
+template<class T>
+Node<T>* InternalNode<T>::insert(T* newObject) {
+	Node<T>* result;
+	int compare = object->compare(*newObject);
+	switch (compare) {
+	case 0:
+	case 1: {
+		InternalNode<T>* newNode = new InternalNode<T>(newObject, this);
+		result = newNode;
+		break;
+	}
+	case -1: {
+		nextNode = nextNode->insert(newObject);
+		result = this;
+		break;
+	}
+	}
+	return result;
+}
+
+template<class T>
+class TailNode: public Node<T> {
+public:
+	TailNode() {
+	}
+	virtual ~TailNode() {
+	}
+	virtual Node<T>* insert(T* object);
+	virtual void show() {
+	}
+};
+
+template<class T>
+Node<T>* TailNode<T>::insert(T* object) {
+	return new InternalNode<T>(object, this);
+}
+
+template<class T>
+class HeadNode: public Node<T> {
+public:
+	HeadNode();
+	virtual ~HeadNode() {
+		delete nextNode;
+	}
+	virtual Node<T>* insert(T* objectToInsert);
+	virtual void show() {
+		std::cout << "Show Head Node" << endl;
+		nextNode->show();
+	}
+private:
+	Node<T>* nextNode;
+};
+
+template<class T>
+HeadNode<T>::HeadNode() {
+	std::cout << "Creating Head node" << endl;
+	nextNode = new TailNode<T>();
+}
+
+template<class T>
+Node<T>* HeadNode<T>::insert(T* objectToInsert) {
+	std::cout << "Insert element to Head Node" << endl;
+	nextNode = nextNode->insert(objectToInsert);
+	return this;
+}
+
+template<class T>
+class LinkedList {
+public:
+	LinkedList();
+	virtual ~LinkedList() {
+		delete headNode;
+	}
+	void insert(T* objectToInsert);
+	void showAll() {
+		std::cout << "Show list:" << endl;
+		headNode->show();
+	}
+private:
+	HeadNode<T>* headNode;
+};
+
+template<class T>
+LinkedList<T>::LinkedList() {
+	headNode = new HeadNode<T>();
+}
+
+template<class T>
+void LinkedList<T>::insert(T* objectToInsert) {
+	std::cout << "Inserting element to list" << endl;
+	headNode->insert(objectToInsert);
+}
+
+void myDogFunction(LinkedList<Dog>& listOfDogs) {
+	Dog* dog;
+	int val;
+
+	while (true) {
+		std::cout << "How old is your dog (0 stop)?";
+		std::cin >> val;
+		if (!val)
+			break;
+		dog = new Dog(val);
+		listOfDogs.insert(dog);
+	}
+}
+
+void myDataFunction(LinkedList<Data>& listOfData) {
+	Data* pData;
+	int val;
+	while (true) {
+		std::cout << "Enter some value (0 stop)?";
+		std::cin >> val;
+		if (!val)
+			break;
+		pData = new Data(val);
+		listOfData.insert(pData);
+	}
+
+}
 
 int main() {
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
@@ -499,7 +740,8 @@ int main() {
 	bool namespaces = execute;
 	bool commandLineInput = execute;
 	bool overrideMemberFuction = execute;
-	bool virtualfunctions = true;
+	bool virtualfunctions = execute;
+	bool templates = true;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
@@ -823,22 +1065,36 @@ int main() {
 	}
 
 	if (virtualfunctions) {
-		cout << endl << ">>> Pure Virtual functions:  <<<"
-				<< endl;
+		cout << endl << ">>> Pure Virtual functions:  <<<" << endl;
 		Fruit* fruit;
 		fruit = new Peach();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
+				<< fruit->getTaste() << ", fruit picture: " << endl;
 		fruit->draw();
 		fruit = new Apple();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
-		cout << "Apple color: " << ((Apple*)fruit)->getColor() << endl;
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
+				<< fruit->getTaste() << ", fruit picture: " << endl;
+		cout << "Apple color: " << ((Apple*) fruit)->getColor() << endl;
 		fruit->draw();
 		fruit = new GreenApple();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: " << fruit->getTaste() << ", fruit picture: " << endl;
-		cout << "Apple color: " << ((Apple*)fruit)->getColor() << endl;
+		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
+				<< fruit->getTaste() << ", fruit picture: " << endl;
+		cout << "Apple color: " << ((Apple*) fruit)->getColor() << endl;
 		fruit->draw();
 
+	}
 
+	if (templates) {
+		cout << endl << ">>> Templates:  <<<" << endl;
+		LinkedList<Dog> listOfDogs;
+		LinkedList<Data> dataList;
+
+		myDogFunction(listOfDogs);
+		myDataFunction(dataList);
+		std::cout << endl;
+		listOfDogs.showAll();
+		std::cout << endl;
+		dataList.showAll();
 
 	}
 

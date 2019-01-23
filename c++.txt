@@ -847,5 +847,21 @@ To access the overridden base member function, write the base name, followed by 
 	}
 	
 
+>>>>>
+Templates create a general class and use types as parameters to build specific instances of the parameterized type. 
+The generic type in the list becomes a parameter to the definition of the class. 
+The action of creating an object from a specific type from a template is called instantiation.
+The individual classes are called instances of the template.
 
+template <class T> // declare the template and the parameter 
+class List         // the class being parameterized 
+{ 
+public: 
+   List(); 
+   // full class declaration here 
+};
 
+The keyword "template" is used at the beginning of every declaration and definition of a template class.
+The template's parameters follow the keyword template; they are the items that will change with each instance.
+The keyword "class" is followed by the identifier T.
+The keyword "class" indicates that this parameter is a type. 
