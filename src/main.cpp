@@ -431,6 +431,9 @@ public:
 	virtual int getWeight() = 0;
 	virtual int getTaste() = 0;
 	virtual void draw() = 0;
+	string sayHello() {
+		return "Fruit say 'Hello'";
+	}
 private:
 };
 
@@ -475,10 +478,15 @@ public:
 	virtual int getTaste() {
 		return 3;
 	}
+	void draw();
 	virtual string getColor() {
 		return "red/yellow";
 	}
-	void draw();
+	// non virtual method can be changed to virtual in subclass
+	// method is virtual only for Apple and subclasses, not for Fruit or Peach class
+	virtual string sayHello() {
+		return "Apple say 'Hello smushy'";
+	}
 };
 void Apple::draw() {
 	cout << "This is Apple followed by\n";
@@ -505,6 +513,13 @@ public:
 	string getColor() {
 		return "Green";
 	}
+
+	// non virtual method can be changed to virtual in subclass
+	// method is virtual only for Apple and subclasses, not for Fruit or Peach class
+	virtual string sayHello() {
+		return "GreenApple say 'Hello jucy'";
+	}
+
 };
 
 class Data {
@@ -740,8 +755,8 @@ int main() {
 	bool namespaces = execute;
 	bool commandLineInput = execute;
 	bool overrideMemberFuction = execute;
-	bool virtualfunctions = execute;
-	bool templates = true;
+	bool virtualfunctions = true;
+	bool templates = execute;
 
 	stringstream version;
 	version << "Version string " << __VERSION__;
@@ -1068,17 +1083,20 @@ int main() {
 		cout << endl << ">>> Pure Virtual functions:  <<<" << endl;
 		Fruit* fruit;
 		fruit = new Peach();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
-				<< fruit->getTaste() << ", fruit picture: " << endl;
+		cout << fruit->sayHello() + " Fruit weight: " << fruit->getWeight()
+				<< ", fruit taste: " << fruit->getTaste() << ", fruit picture: "
+				<< endl;
 		fruit->draw();
 		fruit = new Apple();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
-				<< fruit->getTaste() << ", fruit picture: " << endl;
+		cout << fruit->sayHello() + " Fruit weight: " << fruit->getWeight()
+				<< ", fruit taste: " << fruit->getTaste() << ", fruit picture: "
+				<< endl;
 		cout << "Apple color: " << ((Apple*) fruit)->getColor() << endl;
 		fruit->draw();
 		fruit = new GreenApple();
-		cout << "Fruit weight: " << fruit->getWeight() << ", fruit taste: "
-				<< fruit->getTaste() << ", fruit picture: " << endl;
+		cout << ((Apple*) fruit)->sayHello() + " Fruit weight: "
+				<< fruit->getWeight() << ", fruit taste: " << fruit->getTaste()
+				<< ", fruit picture: " << endl;
 		cout << "Apple color: " << ((Apple*) fruit)->getColor() << endl;
 		fruit->draw();
 
