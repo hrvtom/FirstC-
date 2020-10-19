@@ -1,4 +1,4 @@
->>>>>
+﻿>>>>>
 ANSI/ISO C++ specifikacija jezika nudi predefinirane globalne simbole __LINE__ i __FILE__ (dvostruki znak podcrtavanja se nalazi ispred
 i iza rijeci). Simbol __LINE__ ima numericku vrijednost i pokazuje broj linije u kojoj je simbol naveden, dok simbol __FILE__
 ima vrijednost znakovnog niza i daje naziv datoteke u kojoj je linija navedena.
@@ -757,13 +757,18 @@ as long as it is not modified.
 >>>>>
 Virtual function
 
+Virtual Function
+A virtual function is a member function of base class which can be redefined by derived class. Virtual function is declared and defined
+in base class. Base class having virtual function can be instantiated. Classes having virtual functions are not abstract.
+
+Pure virtual functions
       // pure virtual function
       virtual int area() = 0;
 
 The = 0 tells the compiler that the function has no body and above virtual function will be called pure virtual function.
 It may be redefined in a derived class to suit the objects of that class.
-
-Pure virtual functions
+A pure virtual function is a member function of base class whose only declaration is provided in base class and should be defined
+in derived class otherwise derived class also becomes abstract. No definition is given in base class.
 C++ can create abstract data types with pure virtual functions.
 A pure virtual function is a virtual function that must be overridden in the derived class.
 A virtual function is made pure by initializing it with 0, as in the following statement:
@@ -801,6 +806,12 @@ specificirati kljucnom rijeci "virtual", ali dobra je praksa i u izvedenim klasa
 destruktora.
 Destruktori apstraktnih klasa se u pravilu navode kao virtualni. Razlog tome je sto objekt virtualne klase ne moze biti deklariran,
 pa niti destruktor sa statickim pozivom za takav objekt nema smisla.
+Pure virtual destructors are legal in standard C++ and one of the most important things to remember is that if a class contains
+a pure virtual destructor, it must provide a function body for the pure virtual destructor. You may be wondering why a pure virtual
+function requires a function body. The reason is because destructors (unlike other functions) are not actually ‘overridden’, rather
+they are always called in the reverse order of the class derivation. This means that a derived class’ destructor will be invoked first,
+then base class destructor will be called. If the definition of the pure virtual destructor is not provided, then what function body will
+be called during object destruction?
 
 >>>>>
 Virtualna osnovna klasa
