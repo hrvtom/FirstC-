@@ -306,6 +306,86 @@ Declaration (usuali in .h or .hpp file)
 		pedal(); 
 		brake(); 
 	}; 
+Because a header file might potentially be included by multiple files, it cannot contain definitions that might produce
+multiple definitions of the same name. The following are not allowed, or are considered very bad practice:
+    built-in type definitions at namespace or global scope
+    non-inline function definitions
+    non-const variable definitions
+    aggregate definitions
+    unnamed namespaces
+    using directives
+Use of the 'using' directive will not necessarily cause an error, but can potentially cause a problem because it brings the namespace
+into scope in every .cpp file that directly or indirectly includes that header.
+Sample header file
+// sample.h
+#pragma once
+#include <vector> // #include directive
+#include <string>
+
+namespace N  // namespace declaration
+{
+    inline namespace P
+    {
+        //...
+    }
+
+    enum class colors : short { red, blue, purple, azure };
+
+    const double PI = 3.14;  // const and constexpr definitions
+    constexpr int MeaningOfLife{ 42 };
+    constexpr int get_meaning()
+    {
+        static_assert(MeaningOfLife == 42, "unexpected!"); // static_assert
+        return MeaningOfLife;
+    }
+    using vstr = std::vector<int>;  // type alias
+    extern double d; // extern variable
+
+#define LOG   // macro definition
+
+#ifdef LOG   // conditional compilation directive
+    void print_to_log();
+#endif
+
+    class my_class   // regular class definition,
+    {                // but no non-inline function definitions
+
+        friend class other_class;
+    public:
+        void do_something();   // definition in my_class.cpp
+        inline void put_value(int i) { vals.push_back(i); } // inline OK
+
+    private:
+        vstr vals;
+        int i;
+    };
+
+    struct RGB
+    {
+        short r{ 0 };  // member initialization
+        short g{ 0 };
+        short b{ 0 };
+    };
+
+    template <typename T>  // template definition
+    class value_store
+    {
+    public:
+        value_store<T>() = default;
+        void write_value(T val)
+        {
+            //... function definition OK in template
+        }
+    private:
+        std::vector<T> vals;
+    };
+
+    template <typename T>  // template declaration
+    class value_widget;
+}
+Remember that if you are doing template programming, then you have to keep everything in the .h file so that the compiler will
+instantiate the right code at the moment of compilation.
+
 Definition (Usually in .cpp file) defining declared constructors and methods.
 	int Cart::getSpeed() 
 	{ 
@@ -1303,6 +1383,10 @@ rijeci "class". Time se eksplicitnije naznacava da se odredjeni argument predlos
 	}
 	Ako je odredjeni tip potrebno cesto spominjati unutar template-a koristiti:
 	typedef typename T::A T_od_A;
+
+Remember that if you are doing template programming, then you have to keep everything in the .h file so that the compiler will
+instantiate the right code at the moment of compilation.
+
 !!!!!! ovo sa "typename" koristiti s rezervom, ne podrzavaju svi C++ kompajleri !!!!!!!!
 
 Parametar predloska funkcije moze biti i neka konstanta kojom se dodatno upravlja radom funkcije.
@@ -1897,6 +1981,18 @@ Znak # koji oznacava pocetak pretprocesorske naredbe mora biti prvi znak u retku
 <datoteka>, datoteka se trazi u standardnom imeniku za datoteke zaglavlja,
 "datoteka", datoteka se prvo trazi u tekucem (radnom) imeniku, a ako se ne pronade tamo, datoteka se trazi u standardnim imenicima
 za datoteke zaglavlja.
+Another common question involves how to include header files from other directories.
+One (bad) way to do this is to include a relative path to the header file you want to include as part of the #include line.
+	#include "headers/myHeader.h"
+	#include "../moreHeaders/myOtherHeader.h"
+If you ever update your directory structure, your code won’t work anymore.
+A better method is to tell your compiler or IDE that you have a bunch of header files in some other location, so that it will look there
+when it can’t find them in the current directory.
+Using g++, you can use the -I option to specify an alternate include directory.
+	g++ -o main -I/source/includes main.cpp
+Best practice
+Order your #includes as follows: your own user-defined headers first, then 3rd party library headers, then standard library headers,
+with the headers in each section sorted alphabetically.
 
 Pretprocesorskom naredbom #define definira se vrijednost simbola, tzv macro name.
 Iako nije nuzno, uobicajena je programerska praksa da se, zbog lakse uocljivosti u izvornom kodu, makro imena pisu velikim slovima.
@@ -2038,3 +2134,14 @@ znaka pridruzivanja. Time bi bilo omoguceno postavljanje boja u paletu po sljede
 No takvo rjesenje ne mora uvijek odgovarati. Ono zapravo pretpostavlja tocno odredenu implementaciju koja ne mora uvijek biti ispravna.
 Operator [] jednostavno vraca referencu na odredeni element niza iz Paleta-e. Gornje pridruzivanje se tada provodi tako da se pozove
 operator = za klasu Boja. Klasa Paleta vise nema nikakvog nadzora nad pridruzivanjem svojim clanovima
+
+*****
+Ovo moze raditi samo u slucaju da u arrayu/vektoru na koji pokazuje p postoji vrijednost 0(ili sta vec koje se transformira u false u c++)
+Inace 'for' uvijet za zaustavljanj petlje mozda nikad nece doci do 'false'
+for (const U32* p = m_supportedProtocolRevList; *p; p++)
+    {
+        if (*p == rev)
+        {
+            return true;
+        }
+    }
