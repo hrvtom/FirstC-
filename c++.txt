@@ -1,10 +1,181 @@
 ﻿>>>>>
+
+A declaration needs to contain the name and type of the entity. A definition provides all details it needs to construct/use such an entity.
+For example, a function definition should contain its body, a class definition needs to provide all member functions and variables.
+
+One Definition Rule
+Any unit, template, type, function, or object can have no more than one definition in the program.
+The first thing you notice is it didn’t mention declarations at all. Yes, a symbol can be declared several times!
+
+You can’t put function/variable definitions in header files. As discussed in the previous tutorial (2. Compilation and 3. Linking),
+the reason is it violates the “one definition rule”. However, we can put enum/struct/class definitions in the headers. The same definitions
+are allowed to be in different files. Turns out for enum/struct/classes, they are used differently compared to functions/variables in
+the compiler. The rationale is that enum, struct, class definitions are just “blueprints” or descriptions of the object/variable it intends
+to create. Unlike functions or variables which will be allocated a memory address, the definition of enum/struct/class itself does not
+require memory allocation.
+It’s actually good practice to put struct/class definitions in header files that are shared across different files. It’s worth mentioning
+that multiple definitions of struct/class/enum in the same source file is not allowed and will cause a compile-time error
+
 ANSI/ISO C++ specifikacija jezika nudi predefinirane globalne simbole __LINE__ i __FILE__ (dvostruki znak podcrtavanja se nalazi ispred
 i iza rijeci). Simbol __LINE__ ima numericku vrijednost i pokazuje broj linije u kojoj je simbol naveden, dok simbol __FILE__
 ima vrijednost znakovnog niza i daje naziv datoteke u kojoj je linija navedena.
+ima i __PRETTY_FUNCTION__
 
->>>>>
-variable definition
+#include <name> - angle brackets are used for system headers like iostream, c++ standard libraries (vector, queue, map), etc
+#include "name" - Double quotes are used for user-defined headers
+
+g++ hello.cpp -o hello
+	-o : specify output file name
+	-Wall : enable all the most important and useful warnings
+	-Wuninitialized : warn specifically on uninitialized variables
+	-Werror : treat warning as errors
+	-D<macro>: use compile time macro
+		g++ macro_example.cpp  -o a -DSIZE_ARRAY=10 - SIZE_ARRAY is macro used in macro_example.cpp, this way we can set macro walue
+			#ifndef SIZE_ARRAY
+			#define SIZE_ARRAY 4
+			#endif 
+g++ -c example.cpp -o example.o
+	-c : perform preprocessing + compiling in one step, no linking
+
+mullti_file compiling + linking manual (all files(main.cpp, greeting.h and greeting.cpp) in the same directory):
+	g++ -c main.cpp -o main.o
+	g++ -c greeting.cpp -o greeting.o
+	g++ main.o greeting.o -o a.out - linking
+
+mullti_file compiling + linking make version1
+	- make file sintaks
+	target : dependency
+	<tab> command(s)
+		target is usually the output file name of the command. Dependency specifies the input files or other targets.
+	
+	a.out: main.o greeting.o
+		g++ main.o greeting.o -o a.out
+		
+	main.o: main.cpp greeting.h	- don’t forget to include header files in the dependency list
+		g++ -c main.cpp -o main.o
+	
+	greeting.o: greeting.cpp greeting.h - don’t forget to include header files in the dependency list
+		g++ -c greeting.cpp -o greeting.o
+
+	We can build “a.out” by typing commands “make” or equivalently “make a.out”. By default, Make will pick the first target (a.out) as
+	the default target if the user doesn’t provide it in the command line explicitly.
+
+mullti_file compiling + linking make version2
+	Repeated compiler name “g++” and file name “greeting.h” appeared in multiple commands, we can replace them with macro definitions
+	Same source file/object names (“main.cpp/o”, “greeting.cpp/o”) appearing in target/dependency also show up in the command.
+	We can get rid of the redundancy utilizing the following built-in macros:
+		$@ is a macro that refers to the target
+		$< is a macro that refers to the first dependency
+		$^ is a macro that refers to all dependencies
+
+	CXX=g++
+	HEADER=greeting.h
+	
+	a.out: main.o greeting.o
+		$(CXX) $^ -o $@
+		
+	main.o: main.cpp $(HEADER)
+		$(CXX) -c $< -o $@
+	
+	greeting.o: greeting.cpp $(HEADER)
+		$(CXX) -c $< -o $@
+
+mullti_file compiling + linking make version3
+	 Similar rule definitions for main.o and greeting.o. They are the same rule applying to different source files.
+	 We can unify them using % to match file names:
+	 
+	CXX=g++
+	HEADER=greeting.h
+	
+	a.out: main.o greeting.o
+		$(CXX) $^ -o $@
+		
+	%.o: %.cpp $(HEADER)
+		$(CXX) -c $< -o $@
+
+mullti_file compiling + linking make version4
+	Inserting macro CXXFLAGS/CFLAGS and LD_FLAGS to help specify compile-time and link-time options.
+	Group objects files with a macro OBJ.
+	Adding a “clean” target to help us delete all output/temporary files.
+	
+	CXX=g++
+	CXXFLAGS=-Wall - enabling all warning
+	CXXFLAGS += -I$(UPMI)/inc
+	LDFLAGS=-lpthread - link to pthread library
+	HEADER=greeting.h
+	OBJ = main.o greeting.o
+	
+	a.out: $(OBJ)
+		$(CXX) $^ -o $@ $(LDFLAGS)
+		
+	%.o: %.cpp $(HEADER)
+		$(CXX) -c $< -o $@ $(CXXFLAGS)
+	
+	clean:
+		rm -f *.o a.out	
+		
+Using g++, you can use the -I option to specify an alternate include directory.
+	g++ main.cpp -o main -I/source/includes
+
+
+
+>>>>> variable definition
+>>>>> Declaration,definition,initialization (extern), .h file
+>>>>> Constant creation
+>>>>> macro creation
+>>>>> if statement
+>>>>> switch statement
+>>>>> for loop statement
+>>>>> for each
+>>>>> Operator  - Address Operator '&'
+>>>>> Array
+>>>>> Fuctions without arguments
+>>>>> Prototype
+>>>>> Default Function Parameters
+>>>>> auto-typed variables
+>>>>> Auto-Typed return values
+>>>>> Function overloading/Overriding (samo za non-virtual)
+>>>>> Function return value (neka  moja razmisljanja)
+>>>>> Function Inline
+>>>>> accessor function
+>>>>> Function Lambda expressions
+>>>>> Class Declaratin vs Class Definitions
+>>>>> key word "const"
+>>>>> Pointers to memeber functions
+>>>>> Constructors/Destructors (Default too)
+>>>>> Copy Constructor
+>>>>> Assign built-in type to custom object (int beta = 5; Counter alpha = beta;)
+>>>>> Namespaces
+>>>>> Storage Classes
+>>>>> static storage class
+>>>>> Characters
+>>>>> NULL pointer
+>>>>> typedef
+>>>>> Pointers vs Arrays
+>>>>> Virtual function
+>>>>> Virtualna osnovna klasa (neki C++ shit)
+>>>>> References
+>>>>> accessing members
+>>>>> Constructing (Object, structure)
+>>>>> Operator overloading
+>>>>> Inheritance _constructor
+>>>>> Inheritance - overriden member function
+>>>>> Template clases
+>>>>> Static
+>>>>> Scope
+>>>>> Implicitna/explicitina pretvorba pokazivaca
+>>>>> Razlika nasljedivanja i preopterecenja
+>>>>> Ugnjezdjeni tipovi i nasljedivanje
+>>>>> Klase kao argumenti funkcija
+>>>>> Segmentation fault
+>>>>> try/catch
+>>>>> Operator typeid
+>>>>> Static and dyanmic cast, const cast
+>>>>> Pretprocesor, .h files, #include, #define macro
+>>>>> Povezivanje, linking , .h files
+
+
+>>>>> variable definition
 	int    i, j, k;
 	char   c, ch;
 
@@ -37,103 +208,13 @@ Defining and initializing Vektor with some data with constructor can be done lik
 Declaring objects can be done this way too, both pointer and reference are defined here:
 	Vektor *pointerToVektor, &referenceToVektor = someVektor;
 	
-	
->>>>>
-Constant creation
-The "const" keyword is used to create a "read only" variable. It defines constant that cannot be modified and must be
-initialized during its definition.
+>>>>> Declaration,definition,initialization (extern), .h files
+A declaration needs to contain the name and type of the entity. A definition provides all details it needs to construct/use such an entity.
+For example, a function definition should contain its body, a class definition needs to provide all member functions and variables.
 
-	const double pi = 3.1415947;
-The value of pi cannot be modified by the program. 
-
-	#define Score 5000
-The constant does not have a type such as int or char.
-The #define directive enables a simple text substitution that replaces every instance of Score in the code with 5000.
-
-Constants are r-values but cannot be l-values. 
-
->>>>>
-macro creation
-makro funkcije se prevode tako da se poziv jednostavno zamijeni tekstom definicije makro funkcije, pri cemu se formalni parametri
-zamijene stvarnima.
-
-    #define min(a,b)  ((a) < (b) ? (a) : (b))
-    
-    j = manji(++i,10) se prevede kao
-    
-    j = ((++i) < (10) ? (++i) : 10);
-                        uuups
-                        
->>>>>
-if statement
-
-In C++, the value 0 also is considered false and any other value is true. 
-	if (!x) 
-	if (x == 0) 
-Both statements are true when x equals 0. The second statement is somewhat easier to comprehend. 
-
-You can define and initialize a variable within an if statement.
-The expression is true if converting the variable's value to a bool type yields true.
-The variable is available within the if statement.
-	if( int x = func() ) 
-	{ 
-	. . . // Here to work with x. 
-	}           
-The return value of the function, func(), is used to initialize the variable x.
-If this value is not 0, the statements in the next block are executed.
-The variable x no longer exists after leaving the if statement. 
-
->>>>>
-switch statement
-
-The switch statement compares the value of one expression with multiple constants.
-	switch( expression ) 
-	{ 
-		case const1: [ statement ] 
-							[ break; ] 
-		case const2: [ statement ] 
-							[ break; ] 
-		. 
-		. 
-		. 
-		[default:  statement ] 
-	} 
-First, the expression in the switch statement is evaluated.
-It must be an integral type.
-The result is then compared to the constants, const1, const2, ..., in the case labels.
-The constants must be different and can only be integral types including boolean values and character constants. 
-
->>>>>
-for loop statement
-	for (int x = 0, y = 0; x < 10; x++, y++) 
-	{ 
-		std::cout << x * y << "\n"; 
-	}
-
-	for( expression1; expression2; expression3 ) 
-      statement 
-		expression1 is executed first and only once to initialize the loop.
-		expression2 is the controlling expression, which is always evaluated prior to executing the loop body
-		if expression2 is false, the loop is terminated
-		if expression2 is true, the loop body is executed. Subsequently, the loop is reinitialized by executing
-			expression3 and expression2 is re-tested. 
-Any of the three expressions in a for statement can be omitted.
-You must type at least two semicolons. The shortest loop header is therefore:
-	for(;;) 
-
->>>>>
-for each
-
-The foreach has two sections separated by a colon : instead of three separated by semicolons.
-The first section is a variable that will hold an element of the array. The second is the name of the array. 
-	int production[] = { 1, 6, 8, 4, 3 };
-	for (int year : production)
-	{
-		std::cout << "Output: " << year << std::endl;
-	}
-	
->>>>>
-Declaration,definition,initialization
+One Definition Rule
+Any unit, template, type, function, or object can have no more than one definition in the program.
+The first thing you notice is it didn’t mention declarations at all. Yes, a symbol can be declared several times!
 
 A variable declaration is useful when you are using multiple files and you define your variable in one of the files
 which will be available at the time of linking of the program. You will use "extern" keyword to declare a variable at
@@ -169,34 +250,174 @@ b.cpp
 	float fuga() { // deklaracija & definicija
 		//...
 	}
->>>>>
-Operator  - Address Operator
+
+You can’t put function/variable definitions in header files. As discussed in the previous tutorial (2. Compilation and 3. Linking),
+the reason is it violates the “one definition rule”. However, we can put enum/struct/class definitions in the headers. The same definitions
+are allowed to be in different files. Turns out for enum/struct/classes, they are used differently compared to functions/variables in
+the compiler. The rationale is that enum, struct, class definitions are just “blueprints” or descriptions of the object/variable it intends
+to create. Unlike functions or variables which will be allocated a memory address, the definition of enum/struct/class itself does not
+require memory allocation.
+t’s actually good practice to put struct/class definitions in header files that are shared across different files. It’s worth mentioning
+that multiple definitions of struct/class/enum in the same source file is not allowed and will cause a compile-time error
+
+What you can put in header files:
+    1. function/variables declarations
+    2. struct/class/enum definition
+    3. Inline functions
+    4. constant variables
+    5. templates
+
+Things considered illegal or bad practices in header files:
+    1. non-inline function definitions
+    2. non-const variable definitions
+    3. unnamed namespaces
+    4. aggregate definitions
+    5. using directives
+	
+>>>>> Constant creation
+The "const" keyword is used to create a "read only" variable. It defines constant that cannot be modified and must be
+initialized during its definition.
+
+	const double pi = 3.1415947;
+The value of pi cannot be modified by the program. 
+
+	#define Score 5000
+The constant does not have a type such as int or char.
+The #define directive enables a simple text substitution that replaces every instance of Score in the code with 5000.
+
+Constants are r-values but cannot be l-values. 
+
+Reference se obavezno moraju inicijalizirati, te se to mora uciniti u inicijalizacijskoj listi konstruktora.
+	class Par {
+	public:
+		Vektor &refPrvi, &refDrugi;
+		Par(Vektor &v1, Vektor &v2) : refPrvi(v1), refDrugi(v2) {}
+	};
+Obavezno je bilo staviti v1 i v2 kao reference: u suprotnom bi se prilikom poziva konstruktora stvarale privremene kopije stvarnih
+parametara, a reference bi se inicijalizirale adresom tih privremenih kopija. Nakon zavrsetka konstruktora kopije bi se unistile,
+a reference bi pokazivale na memoriju u kojoj vise nema objekta.
+Na slicne probleme nailazimo ako klasa sadrzava konstantne clanove: njih je takoder potrebno inicijalizirati u konstruktoru,
+a vrijednost im se kasnije ne moze mijenjat
+Konstantni podatkovni clanovi objekta se obavezno moraju inicijalizirati, te se to mora uciniti u inicijalizacijskoj listi konstruktora.
+	class Tablica {
+	private:
+		int *Elementi;
+		int BrojElem, Duljina;
+		const int maxDuljina;
+	public:
+		Tablica();
+		Tablica(int BrElem, int duljina);
+		// ostali Clanovi se ne mijenjaju
+	};
+Sada se clan maxDuljina obavezno mora inicijalizirati, i to se mora uciniti u inicijalizacijskoj listi konstruktora:
+	Tablica::Tablica() : maxDuljina(50),
+						Elementi(new int[10]),
+						BrojElem(0), Duljina(10) {
+	}
+	Tablica::Tablica(int BrElem, int duljina) :
+						maxDuljina(duljina), Elementi(new int[10]),
+						BrojElem(0), Duljina(BrElem) {
+	}
+
+>>>>> macro creation
+makro funkcije se prevode tako da se poziv jednostavno zamijeni tekstom definicije makro funkcije, pri cemu se formalni parametri
+zamijene stvarnima.
+
+    #define min(a,b)  ((a) < (b) ? (a) : (b))
+    
+    j = manji(++i,10) se prevede kao
+    
+    j = ((++i) < (10) ? (++i) : 10);
+                        uuups
+                        
+>>>>> if statement
+
+In C++, the value 0 also is considered false and any other value is true. 
+	if (!x) 
+	if (x == 0) 
+Both statements are true when x equals 0. The second statement is somewhat easier to comprehend. 
+
+You can define and initialize a variable within an if statement.
+The expression is true if converting the variable's value to a bool type yields true.
+The variable is available within the if statement.
+	if( int x = func() ) 
+	{ 
+	. . . // Here to work with x. 
+	}           
+The return value of the function, func(), is used to initialize the variable x.
+If this value is not 0, the statements in the next block are executed.
+The variable x no longer exists after leaving the if statement. 
+
+>>>>> switch statement
+
+The switch statement compares the value of one expression with multiple constants.
+	switch( expression ) 
+	{ 
+		case const1: [ statement ] 
+							[ break; ] 
+		case const2: [ statement ] 
+							[ break; ] 
+		. 
+		. 
+		. 
+		[default:  statement ] 
+	} 
+First, the expression in the switch statement is evaluated.
+It must be an integral type.
+The result is then compared to the constants, const1, const2, ..., in the case labels.
+The constants must be different and can only be integral types including boolean values and character constants. 
+
+>>>>> for loop statement
+	for (int x = 0, y = 0; x < 10; x++, y++) 
+	{ 
+		std::cout << x * y << "\n"; 
+	}
+
+	for( expression1; expression2; expression3 ) 
+      statement 
+		expression1 is executed first and only once to initialize the loop.
+		expression2 is the controlling expression, which is always evaluated prior to executing the loop body
+		if expression2 is false, the loop is terminated
+		if expression2 is true, the loop body is executed. Subsequently, the loop is reinitialized by executing
+			expression3 and expression2 is re-tested. 
+Any of the three expressions in a for statement can be omitted.
+You must type at least two semicolons. The shortest loop header is therefore:
+	for(;;) 
+
+>>>>> for each
+
+The foreach has two sections separated by a colon : instead of three separated by semicolons.
+The first section is a variable that will hold an element of the array. The second is the name of the array. 
+	int production[] = { 1, 6, 8, 4, 3 };
+	for (int year : production)
+	{
+		std::cout << "Output: " << year << std::endl;
+	}
+	
+
+>>>>> Operator  - Address Operator '&'
 
 You can use the address-of operator & to get variable memory address. 
 
->>>>>
-Array
+>>>>> Array
 
 	int my_array[10] = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 };
 	int my_array[] = { 10, 20, 30, 40, 50 }; 
 	const int size = sizeof(my_array) / sizeof(my_array[0]);
 	
->>>>>
-Fuctions without arguments
+>>>>> Fuctions without arguments
 
 If a function does not expect an argument, the function prototype must be declared as void or empty braces. 
 	int rand( void );
 	or
 	int rand(); 
 
->>>>>
-Prototype
+>>>>> Prototype
 
 The prototype is the declaration of the function and describes only the formal interface of that function.
 You can omit parameter names from the prototype. 
 
->>>>>
-Default Function Parameters
+>>>>> Default Function Parameters
 
 If the function prototype declares a default value for a parameter, the function can be called without that parameter. 
 If a parameter does not have a default value, no previous parameter may have a default value. 
@@ -208,8 +429,7 @@ If a parameter does not have a default value, no previous parameter may have a d
 	
 Uocimo kako su podrazumijevani argumenti konstruktora navedeni samo u deklaraciji klase, ali ne i u definiciji konstruktora.
 
->>>>>
-auto-typed variables
+>>>>> auto-typed variables
 The "auto" keyword makes C++ to infer type based on the value initially assigned to it. 
 	auto index = 3; 
 	auto multiple = 2.25F; 
@@ -219,8 +439,7 @@ same as:
 multiple value assignement
 	auto a = 86, b = 75, c = 309; 
 
->>>>>
-Auto-Typed return values
+>>>>> Auto-Typed return values
 
 To make a function's return type determined by deduction, use "auto" where the return type is specified,
 as in this simple function:
@@ -229,20 +448,29 @@ as in this simple function:
 		return x - y; 
 	} 
 
->>>>>
-Function overloading/Overriding
+>>>>> Function overloading/Overriding (samo za non-virtual)
 
 When you overload a member function, you create more than one function with the same name but with different signatures. 
-When you override a member function, you create a function in a derived class with the same name
-as a function in the base class and with the same signature. 
+When you override a member function, you create a function in a derived class with the same name as a function in the base class
+and with the same signature. 
 
 In C++, more than one function can have the same name as long as there are differences in their arguments.
 The functions must have different data types for parameters, a different number of parameters, or both.
 The return types for overloaded functions do not factor into whether they are different.
 You can't overload function by making the return different, however.
 
->>>>>
-Function Inline
+>>>>> Function return value (neka  moja razmisljanja)
+(see >>>>> References)
+Ako je return type by referenca, return objekt nekako treba prezivjeti kraj funkcije, return objekt se moze definirati kao 'static'
+Ako pak nije 'static',u tom slucaju ce se pozvati Copy contructor. Naravno tada najvjerojatnije treba imati custom
+copy constructor (problem s pointerima)
+	static object
+	return object
+Ako je return type pointer, tada objekt kreiran s 'new' nece biti izbrisan(valjda) 
+	type* object = new
+	return object
+
+>>>>> Function Inline
 
 If a C++ function is declared with the keyword "inline", the compiler copies the code from the inline function directly into
 the place where the function was called.
@@ -269,20 +497,18 @@ Here's an example:
 		void setSpeed(int newSpeed); 
 	}; 
 
->>>>>
+>>>>> accessor function
 A function that sets or gets the value of a private member variable is called an accessor.
 Other classes must call the accessor instead of working directly with the variable. 
 
->>>>>
-Function Lambda expressions
+>>>>> Function Lambda expressions
 
 A lambda expressions create inline anonymous functions. 
 	auto my_lambda = [](){ std::cout << "this is a test!" << std::endl; }; 
 	my_lambda();
 When a lambda expression has no arguments, the parentheses can be left out of the expression.
 	auto my_lambda = []{ std::cout << "this is a test!" << std::endl; };
-The lambda expression can have one or more arguments, which are specified within the parenthesis marks after the
-[ ] square brackets.
+The lambda expression can have one or more arguments, which are specified within the parenthesis marks after the [ ] square brackets.
 	auto multiply = [](int x, int y){ std::cout << "Total: " << x * y << std::endl; }; 
 	multiply(5, 5);
 The expression can return a value by specifying its return type (or auto) after a "->" operator. 
@@ -294,15 +520,14 @@ List the variables inside the [ and ] brackets separated by commas.
 	auto multiply = [x](int y) -> int { return x * y; }; 
 	int sum = multiply(17); 
 	
->>>>>
-Class Declaratin vs Class Definitions
-Declaration (usuali in .h or .hpp file)
+>>>>> Class Declaratin vs Class Definitions
+Declaration (usually in .h or .hpp file)
 	class Cart 
 	{ 
 	public: 
 		int speed; 
 		int wheelSize;
-		ing getSpeed();
+		int getSpeed();
 		pedal(); 
 		brake(); 
 	}; 
@@ -392,8 +617,7 @@ Definition (Usually in .cpp file) defining declared constructors and methods.
 		return speed; 
 	}
 
->>>>>
-"const"
+>>>>> key word "const"
 
     const int Constant1=96; 
 will create an integer constant, unimaginatively called "Constaint1"
@@ -410,6 +634,10 @@ declares that Constant3 is constant pointer to a variable integer and
     int const * const Constant4
 declares that Constant4 is constant pointer to a constant integer. Basically "const" applies to whatever is on its immediate left
 (other than if there is nothing there in which case it applies to whatever is its immediate right).
+
+Does “X& const x” make any sense?
+No, it is nonsense. References are always const, in the sense that you can never reseat a reference to make it refer to
+a different object.
 
 Even more useful is a pointer (constant or otherwise) to a const value. This is useful for returning constant strings
 and arrays from functions which, because they are implemented as pointers, the program could otherwise try to alter and crash.
@@ -440,9 +668,7 @@ it basically means the method cannot modify the class instance
 		// do stuff that leaves members unchanged
 	}
 	
-	
->>>>>
-Pointers to memeber functions
+>>>>> Pointers to memeber functions
 
 A function name is a constatnt pointer to the function.
 You can declare a pointer variable that points to a function and to invoke the function using that pointer
@@ -453,7 +679,7 @@ The declaration of a function pointer always includes the return type and parent
 	.
 	pFunct = square;
 You can declare an array of pointers to the functions
-		void (*pFuncArray[amxArray])(int&,int&)
+	void (*pFuncArray[amxArray])(int&,int&)
 		
 pFunc points to a member function of the class Shape, which takes two integers and returns void: 
 	void (Shape::*pFunc)(int, int);
@@ -468,7 +694,6 @@ pFunc points to a member function of the class Shape, which takes two integers a
 	.
 	(ptrToMammaObject->*pFunc)()
 
->>>>>
 Pointers to member functions can be stored in an array. 
 	typedef void (Dog::*PDF)() const;
 	.
@@ -485,8 +710,7 @@ Pointers to member functions can be stored in an array.
 		pDog = new Dog; 
         (pDog->*dogFunctions[method - 1])(); 
 
->>>>>
-Default Constructors/Destructors
+>>>>> Constructors/Destructors (Default too)
 You can set an object up without specifying parameters:
 	Cart shoppingCart; 
 	Rectangle rect; 
@@ -520,8 +744,14 @@ example how to use overloaded constructor:
 	SomeObject(int value){
 	  constructor body
 	}
->>>>>
-Copy Constructor
+	
+Destruktor se automatski poziva u sljedecim situacijama:
+	za automatske objekte na kraju bloka u kojem je objekt definiran (kraj bloka je oznacen zatvorenom viticastom zagradom),
+	za staticke i globalne objekte nakon izlaska iz funkcije main(),
+	za dinamicke objekte prilikom unistenja dinamickog objekta operatorom delete.
+Operator delete se moze bez opasnosti primijeniti na pokazivac koji ima vrijednost nula. U tom slucaju se destruktor ne poziva.
+
+>>>>> Copy Constructor
 
 The copy constructor is called every time a copy of an object is made.
 When you pass an object by value, a temporary copy of that object is made.
@@ -540,9 +770,9 @@ A deep copy copies the values allocated on the heap to newly allocated memory.
 	{ 
 		speed = new int; 
 		*speed = rhs.getSpeed(); 
-	} 
->>>>>
-Assign built-in type to custom object
+	}
+	
+>>>>> Assign built-in type to custom object
 
 The following code creates a conversion operator: a constructor that takes an int and produces a Counter object. 
 	class Counter{
@@ -570,8 +800,7 @@ The following code creates a conversion operator: a constructor that takes an in
 The constructor is overloaded to take an int. The effect of this constructor is to create a Counter out of an int. 
 Given this constructor, the compiler knows to call it when an integer is assigned to a Counter object. 
 
->>>>>
-Namespaces
+>>>>> Namespaces
 
 Elements belonging to a namespace can be referenced directly by name within the namespace.
 Identifikatori klasa, funkcija i drugih elemenata C++ jezika se mogu smjestiti u imenike.
@@ -712,8 +941,7 @@ Clanovima imenika bez naziva se pristupa bez eksplicitnog navodjenja imenika:
 	 // globalni i ili i iz imenika
 	 ::i = 0;// OK: globalni i
 	}
->>>>>
-Storage Classes
+>>>>> Storage Classes
 
 The following storage class specifiers can be used
 	extern		use extern to reference global variables defined in the another file. In this way we tell the compiler that
@@ -729,8 +957,7 @@ You can define an object with:
 						reference the object.
 	program scope		The object is available throughout the program. These objects are often referred to as global.
 
->>>>>
-static storage class
+>>>>> static storage class
 
 The static storage class instructs the compiler to keep a local variable in existence during the life-time of
 the program instead of creating and destroying it each time it comes into and goes out of scope. Therefore,
@@ -754,8 +981,7 @@ public:
 
 int Box::count = 0;
 
->>>>>
-Characters
+>>>>> Characters
 
       void print(char* c) { // ispisule cijeli char field
          cout << "Printing character: " << c << endl;
@@ -771,8 +997,7 @@ void printCharacter(char* c, int i) { //ispisuje character na +i indexu
 }
 
 
->>>>>
-NULL pointer
+>>>>> NULL pointer
 It is always a good practice to assign the pointer NULL to a pointer variable in case you do not have exact address
 to be assigned. This is done at the time of variable declaration. A pointer that is assigned NULL is called
 a null pointer.
@@ -811,13 +1036,11 @@ by declaring pointer as a method agrument, method can accept null values soo you
 void someMethod(SomeType* someType){
 }
 
->>>>>
-typedef
+>>>>> typedef
 
 Korisnicki tipovi definirani pomocu kljucne rijeci "typedef" su takoder vidljivi samo unutar datoteke u kojoj su definirani.
 
->>>>>
-Pointers vs Arrays
+>>>>> Pointers vs Arrays
 
 A pointer that points to the beginning of an array can access that array by using either pointer arithmetic
 or array-style indexing.
@@ -834,8 +1057,7 @@ be used as l-value.
 Because an array name generates a pointer constant, it can still be used in pointer-style expressions,
 as long as it is not modified.
 
->>>>>
-Virtual function
+>>>>> Virtual function
 
 Virtual Function
 A virtual function is a member function of base class which can be redefined by derived class. Virtual function is declared and defined
@@ -893,8 +1115,16 @@ they are always called in the reverse order of the class derivation. This means 
 then base class destructor will be called. If the definition of the pure virtual destructor is not provided, then what function body will
 be called during object destruction?
 
->>>>>
-Virtualna osnovna klasa
+What is the difference beween:
+	virtual void funcFoo() const = 0;
+		- You can't change the state of the object
+		- You can call this function via const objects (non const objects too !?)
+		- You can only call another const member functions on this object
+	virtual void funcFoo() = 0;
+		- You can change the state of the object
+		- You can't call this function via const objects
+
+>>>>> Virtualna osnovna klasa
 
 Kako je u C++ moguce da klasa nasljedjuje po dvije i vise klasa, takodjer je moguce da klase koje se nasljedjuju imaju 
 zajednicku osnovnu klasu, tj. one same nasljedjuju istu klasu.
@@ -927,10 +1157,9 @@ kako to rijesiti, s pomocu virtualne osnovne klase
      class Poligon: public virtual GObject{....
      class Text: public virtual GObject{......
 
-Dostao ovoj gluposti
+Dosta o ovoj gluposti
 
->>>>>
-References
+>>>>> References
 References are usually used for function argument lists and function return values.
 Pointers are variables that hold the address of another object.A reference is alias for an object that already exists. 
 Defining a reference does not occupy additional memory.
@@ -992,11 +1221,11 @@ Reference se obavezno moraju inicijalizirati, te se to mora uciniti u inicijaliz
 		Vektor &refPrvi, &refDrugi;
 		Par(Vektor &v1, Vektor &v2) : refPrvi(v1), refDrugi(v2) {}
 	};
-Obavezno je bilo staviti v1 i v2 kao reference: u suprotnom bi se prilikom poziva konstruktora stvarale privremene kopije stvarnih parametara,
-a reference bi se inicijalizirale adresom tih privremenih kopija. Nakon zavrsetka konstruktora kopije bi se unistile, a reference bi pokazivale
-na memoriju u kojoj vise nema objekta.
-Na slicne probleme nailazimo ako klasa sadrzava konstantne clanove: njih je takoder potrebno inicijalizirati u konstruktoru, a vrijednost im se
-kasnije ne moze mijenjat
+Obavezno je bilo staviti v1 i v2 kao reference: u suprotnom bi se prilikom poziva konstruktora stvarale privremene kopije stvarnih
+parametara, a reference bi se inicijalizirale adresom tih privremenih kopija. Nakon zavrsetka konstruktora kopije bi se unistile,
+a reference bi pokazivale na memoriju u kojoj vise nema objekta.
+Na slicne probleme nailazimo ako klasa sadrzava konstantne clanove: njih je takoder potrebno inicijalizirati u konstruktoru,
+a vrijednost im se kasnije ne moze mijenjat
 Konstantni podatkovni clanovi objekta se obavezno moraju inicijalizirati, te se to mora uciniti u inicijalizacijskoj listi konstruktora.
 	class Tablica {
 	private:
@@ -1018,8 +1247,7 @@ Sada se clan maxDuljina obavezno mora inicijalizirati, i to se mora uciniti u in
 						BrojElem(0), Duljina(BrElem) {
 	}
 
->>>>>
-accessing members
+>>>>> accessing members
 
 Structure
 To access any member of a structure, we use the member access operator (.)
@@ -1037,8 +1265,7 @@ you must initialize the pointer before using it.
 	or
 	(*my_pointer).GetAge();
 
->>>>>
-Constructing
+>>>>> Constructing (Object, structure)
 
 	Rectangle(int a = 0, int b = 0) :Shape(a, b) {}
 
@@ -1057,20 +1284,21 @@ Ako je neki objekt izostavljen iz inicijalizacijske liste, pozvat ce se podrazum
 Podatkovni clanovi ugradenih tipova (int, float, char) ne moraju biti navedeni u inicijalizacijskoj listi,
 te ce u tom slucaju ostati neinicijalizirani.
 
-Dobro je uociti da prevoditelj, za klase koje imaju kao clanove reference i konstantne objekte, ne moze sam generirati podrazumijevani konstruktor.
-Razlog je u tome sto se reference i konstantni clanovi moraju inicijalizirati u inicijalizacijskoj listi konstruktora te im se vrijednost kasnije
-ne moze mijenjati. Prevoditelj ne zna kako treba inicijalizirati referencu, odnosno konstantan clan.
+Dobro je uociti da prevoditelj, za klase koje imaju kao clanove reference i konstantne objekte, ne moze sam generirati podrazumijevani
+konstruktor. Razlog je u tome sto se reference i konstantni clanovi moraju inicijalizirati u inicijalizacijskoj listi konstruktora te im se
+vrijednost kasnije ne moze mijenjati. Prevoditelj ne zna kako treba inicijalizirati referencu, odnosno konstantan clan.
 
 Klasa ne mora definirati konstruktor kopije. Ako on nije eksplicitno definiran, prevoditelj ce ga generirati sam, neovisno o tome
 postoji li jos koji drugi konstruktor. Taj konstruktor kopije ce pozvati konstruktor kopije za svaki pojedini podatkovni clan.
 Za ugradene tipove konstruktor kopije jednostavno dodjeljuje njihovu vrijednost odgovarajucem podatkovnom clanu objekta.
 Za podatkovne clanove koji su objekti korisnicki definiranih klasa, koristi se konstruktor kopije definiran za tu klasu.
 Konstruktor kopije se takoder koristi za stvaranje privremenih objekata prilikom prosljedivanja objekata u funkciju i njihovog vracanja.
-No u slucaju klase Tablica stvari su drukcije. Ta klasa sadrzi pokazivac na memoriju kojemu se vrijednost odreduje prilikom stvaranja objekta.
-Ako bi konstruktor kopije jednostavno inicijalizirao sve clanove kopije vrijednostima clanova originala, oba bi objekta pokazivala na isti objekt.
-Klase koje sadrze pokazivace na dinamicki alocirane segmente memorije gotovo uvijek iziskuju korisnicki definiran konstruktor kopije.
->>>>>
-Operator overloading
+No u slucaju klase Tablica stvari su drukcije. Ta klasa sadrzi pokazivac na memoriju kojemu se vrijednost odreduje prilikom stvaranja
+objekta. Ako bi konstruktor kopije jednostavno inicijalizirao sve clanove kopije vrijednostima clanova originala, oba bi objekta pokazivala
+na isti objekt. Klase koje sadrze pokazivace na dinamicki alocirane segmente memorije gotovo uvijek iziskuju korisnicki definiran
+konstruktor kopije.
+
+>>>>> Operator overloading
 When you implement an operator for a class, you are overloading that operator.
 The most common way to overload an operator in a class is to use a member function.
 The function declaration takes this form:
@@ -1148,18 +1376,14 @@ operator =
 		speed = new int;  //!!! why this
 		*speed = rhs.getSpeed(); 
 		return *this; 
-	} 
+	}
 
->>>>>
-Destructor
-Destruktor se automatski poziva u sljedecim situacijama:
-	za automatske objekte na kraju bloka u kojem je objekt definiran (kraj bloka je oznacen zatvorenom viticastom zagradom),
-	za staticke i globalne objekte nakon izlaska iz funkcije main(),
-	za dinamicke objekte prilikom unistenja dinamickog objekta operatorom delete.
-Operator delete se moze bez opasnosti primijeniti na pokazivac koji ima vrijednost nula. U tom slucaju se destruktor ne poziva.
+za operator= pogledaj >>>>> Razlika nasljedivanja i preopterecenja
+Svaka izvedena klasa mora definirati svoj operator pridruzivanja(operator=). Jasna je i svrha tog pravila: operator pridruzivanja mora
+inicijalizirati cijeli objekt, a ne samo njegov dio.
+Pravilo koje se takoder vrlo cesto zaboravlja jest da se operator pridruzivanja ne nasljeduje.
 
->>>>>
-Inheritance _constructor
+>>>>> Inheritance _constructor
 
 class Mammal
 {
@@ -1201,8 +1425,7 @@ Dog::Dog(int age, int newWeight) : Mammal(age), breed(2)
   std::cout << "Dog(int, int) constructor ...\n";
 }
 
->>>>>
-Inheritance - overriden member function
+>>>>> Inheritance - overriden member function
 
 To access the overridden base member function, write the base name, followed by two colons, and then the function name.
 
@@ -1222,8 +1445,7 @@ To access the overridden base member function, write the base name, followed by 
 	}
 	
 
->>>>>
-Template clases
+>>>>> Template clases
 Templates create a general class and use types as parameters to build specific instances of the parameterized type. 
 The generic type in the list becomes a parameter to the definition of the class. 
 The action of creating an object from a specific type from a template is called instantiation.
@@ -1416,8 +1638,7 @@ Primjer zbrajanje
 	template <class T1, class T2, class T3>
 	T3 zbroji(T1 a,T2 b){....
 
->>>>>
-Static
+>>>>> Static
 
 Staticki podatkovni clanovi se dodatno razlikuju od obicnih clanova po tome sto klasa moze sadrzavati staticki objekt te klase.
 U slucaju obicnih clanova, klasa moze sadrzavati samo pokazivace i reference na objekte te klase, na primjer:
@@ -1475,8 +1696,7 @@ s2.cpp
 		int br;
 		char ch;
 	};
->>>>>
-Scope
+>>>>> Scope
 ::nekaVarijable global scope
 ::nekaFunkcija() global scope
 Klasa::nekaVarijable class scope
@@ -1491,8 +1711,7 @@ Ime u nekom podrucju sakrit ce isto ime u nadredenom podrucju bez obzira sto ta 
 		void duljina(int, float); // skriva ::duljina
 	};	
 	
->>>>>
-Implicitna/explicitina pretvorba pokazivaca
+>>>>> Implicitna/explicitina pretvorba pokazivaca
 
 Moguca je implicitna pretvorba pokazivaca i referenci izvedene klase u njenu javnu osnovnu klasu
 class Izvedena: public Osnovna{
@@ -1523,11 +1742,11 @@ Smisao zastiæcnog nasljedivanja je skrivanje javnog sucelja osnovne klase od va
 presutno postalo dostupno i vanjskom programu. Drukcije su okolnosti unutar klase: javno sucelje osnovne klase je regularno dostupno i
 unutar klase te zbog toga pretvorba ne moze narusiti princip skrivanja informacija.
 	
-1. Objekt izvedene klase moze se implicitno pretvoriti u objekt javne osnovne klase.
+1. Objekt izvedene klase moze se implicitno pretvoriti u objekt javne(public) osnovne klase.
 2. Referenca na objekt izvedene klase moze se implicitno pretvoriti u referencu na
-	objekt javne osnovne klase.
+	objekt javne(public) osnovne klase.
 3. Pokazivac na objekt izvedene klase moze se implicitno pretvoriti u pokazivac na
-	objekt javne osnovne klase.
+	objekt javne(public) osnovne klase.
 4. Pokazivac na clan izvedene klase moze se implicitno pretvoriti u pokazivac na clan
 	javne osnovne klase.
 
@@ -1538,8 +1757,7 @@ pokazivac na bilo koji drugi tip.
 Ako je potrebno pretvoriti pokazivac na objekt osnovne klase u pokazivac na objekt
 izvedene klase, potrebno je koristiti eksplicitnu pretvorbu.
 
->>>>>
-Razlika nasljedivanja i preopterecenja
+>>>>> Razlika nasljedivanja i preopterecenja
 
 	class Osnovna {
 	public:
@@ -1650,8 +1868,7 @@ Obrnuto ne vrijedi.
 Pokazivac na LVektor pokazivat ce na pocetak objekta. Prilikom pretvorbe u recimo pokazivac na Vektor, bit ce ga potrebno uvecati tako da pokazuje
 na pocetak podobjekta Vektor.
 
->>>>>
-Ugnjezdjeni tipovi i nasljedivanje
+>>>>> Ugnjezdjeni tipovi i nasljedivanje
 	class SkupNizova {
 	protected:
 	
@@ -1679,8 +1896,7 @@ Takodjer, ugnijezdena klasa moze posluziti kao objekt nasljedivanja, s time da u
 		// ...
 	};
 
->>>>>
-Klase kao argumenti funkcija
+>>>>> Klase kao argumenti funkcija
 
 Ako postoje dvije funkcije od kojih u parametrima svaka ima po jednu neposrednu javnu osnovnu klasu, poziv funkcije se smatra automatski nejasnim
 te se javlja pogreska prilikom prevodenja. Programer tada mora pomocu eksplicitne dodjele tipa odrediti koja se varijanta funkcije poziva:
@@ -1725,8 +1941,7 @@ koristiti i za obicne realne brojeve. Konverziju realnog broja u kompleksni moze
 	Kompleksni kor = Korijen1(3.9);
 
 
->>>>>
-Segmentation fault
+>>>>> Segmentation fault
 access to released objects
 
 	Temp* someF(){
@@ -1752,8 +1967,7 @@ Same is valid for *p
 slicno funkcijama, ako se ne namjerava pristupati vrijednosti parametra unutar bloka, dovoljno je samo navesti tip parametra,
 a naziv se moze izostaviti.
 
->>>>>
-try/catch
+>>>>> try/catch
 
 *****
 jako vazno
@@ -1879,8 +2093,7 @@ proslijedene iz funkcije.
 
 U slucaju da prilikom izvodenja konstruktora dode do pogreske, konstruktor ce baciti iznimku koja ce opisati pogresku.
 
->>>>>
-Operator typeid
+>>>>> Operator typeid
 
 "typeid" se primjenjuje tako da se u zagradama navede >>>izraz<<< koji nakon izracunavanja ima vrijednost pokazivaca, objekta ili reference
 na objekt neke klase. Kao rezultat operator ce dati informaciju o stvarnom tipu objekta tako sto ce vratiti referencu na konstantan objekt
@@ -1892,8 +2105,7 @@ Naziv klase se moze dobiti pomocu poziva funkcijskog clana name().
 	
 	cout << typeid(*go).name() << endl;
 	
->>>>>
-Static and dyanmic cast, const cast
+>>>>> Static and dyanmic cast, const cast
 
 	Linija *pokLinija = new LinijaSaStrelicama;	// upcast, static cast
 	
@@ -1971,8 +2183,7 @@ Prilikom pretvorbe operator nece provesti nikakvu promjenu vrijednosti pokazivac
 na novi nacin -  kao pokazivac na objekt Osnovna2. Pristup clanu osn2 preko pokazivaca pok rezultirat ce promjenom vrijednosti clana osn1
 (ovo kao necemu slizi u C++)
 
->>>>>
-Pretprocesor
+>>>>> Pretprocesor, .h files, #include, #define macro
 Znak # koji oznacava pocetak pretprocesorske naredbe mora biti prvi znak u retku iza eventualnih praznina. Naredba se proteze do kraja retka
 (tj. do znaka za novi redak), ali se moze nastaviti i u sljedecem retku, ako se redak zakljuci znakom \.
 
@@ -2013,8 +2224,7 @@ Operator # ispred simbolickog imena pretvorit ce ga u znakovni niz.
 
 #if, #ifdef, #ifndef, #elif, #else, #endif
 
->>>>>
-Povezivanje
+>>>>> Povezivanje, linking , .h files
 
 Sto valja staviti u datoteke zaglavlja? Buduci da su objekti i funkcije s vanjskim povezivanjem vidljivi u svim modulima, ako zelimo
 omoguciti pravilno prevodenje pojedinih modula, ocito je neophodno navesti deklaracije svih objekata i funkcija koji ce biti koristeni
@@ -2065,8 +2275,43 @@ Sto ne stavljati u datoteke zaglavlja:
 Definicije funkcija
 Definicije objekata
 	int a; - u svakoj datoteci u koju ukljucimo datoteku zaglavlja dobiti cemo po jedan globalni simbol navedenog imena
->>>>>
-Some examples
+	
+You can’t put function/variable definitions in header files. As discussed in the previous tutorial (2. Compilation and 3. Linking),
+the reason is it violates the “one definition rule”. However, we can put enum/struct/class definitions in the headers. The same definitions
+are allowed to be in different files. Turns out for enum/struct/classes, they are used differently compared to functions/variables in
+the compiler. The rationale is that enum, struct, class definitions are just “blueprints” or descriptions of the object/variable it intends
+to create. Unlike functions or variables which will be allocated a memory address, the definition of enum/struct/class itself does not
+require memory allocation.
+t’s actually good practice to put struct/class definitions in header files that are shared across different files. It’s worth mentioning
+that multiple definitions of struct/class/enum in the same source file is not allowed and will cause a compile-time error
+
+What you can put in header files:
+    1. function/variables declarations
+    2. struct/class/enum definition
+    3. Inline functions
+    4. constant variables
+    5. templates
+
+Things considered illegal or bad practices in header files:
+    1. non-inline function definitions
+    2. non-const variable definitions
+    3. unnamed namespaces
+    4. aggregate definitions
+    5. using directives
+
+*****
+	#ifndef TOCKA_H
+	#define TOCKA_H
+	// deklaracija i definicije
+	#endif
+Pomocu ovakvog ispitivanja izbjegava se moguca visekratna deklaracija klase.
+U gornjem programu deklaracija klase Tocka ukljucena je u modul poglavar.cpp. Istovremeno, klasa Tocka mora biti poznata deklaraciji
+klase Pravac. Kako je deklaracija klase Pravac takoder ukljucena u modul poglavar.cpp, deklaracija klase Tocka pojaviti ce se dva puta.
+Na ovo ce prevoditelj prijaviti kao pogresku.
+	pragma once
+valjda rjesava isti problem
+
+>>>>> Some examples
 
 *****
 class Tablica{
@@ -2090,17 +2335,6 @@ void Tablica::increase(int newNum){
 	elements = newElements;
 }
 
-*****
-	#ifndef TOCKA_H
-	#define TOCKA_H
-	// deklaracija i definicije
-	#endif
-Pomocu ovakvog ispitivanja izbjegava se moguca visekratna deklaracija klase.
-U gornjem programu deklaracija klase Tocka ukljucena je u modul poglavar.cpp. Istovremeno, klasa Tocka mora biti poznata deklaraciji
-klase Pravac. Kako je deklaracija klase Pravac takoder ukljucena u modul poglavar.cpp, deklaracija klase Tocka pojaviti ce se dva puta.
-Na ovo ce prevoditelj prijaviti kao pogresku.
-	pragma once
-valjda rjesava isti problem
 
 *****
 lukavo, lukavo nema sto:
@@ -2145,3 +2379,57 @@ for (const U32* p = m_supportedProtocolRevList; *p; p++)
             return true;
         }
     }
+
+*****
+transfer by reference
+ 
+1.
+	#include <iostream>
+	using namespace std;
+	void swapNums(int &x, int &y) {
+  		int z = x;
+  		x = y;
+  		y = z;
+	}
+	int main() {
+		int firstNum = 10;	
+		int secondNum = 20;
+		cout << firstNum << secondNum << "\n";
+		swapNums(firstNum, secondNum);
+		cout << firstNum << secondNum << "\n";
+		return 0;
+	}
+	
+2.
+	#include <iostream>
+	using namespace std;
+	void swapNums(int &x, int &y) {
+		int z = x;
+		x = y;
+		y = z;
+	}
+	int main() {
+		int* firstP = new int(10);
+		int* secondP = new int(20);
+		cout << *firstP << *secondP << "\n";
+		swapNums(*firstP, *secondP);
+		cout << *firstP << *secondP << "\n";
+		return 0;
+	}
+	
+3.
+	#include <iostream>
+	using namespace std;
+	void swapNums(int* x, int* y) {
+		int z = *x;
+		*x = *y;
+		*y = z;
+	}
+	int main() {
+		int* firstP = new int(10);
+		int* secondP = new int(20);
+		cout << *firstP << *secondP << "\n";
+		swapNums(firstP, secondP);
+		cout << *firstP << *secondP << "\n";
+		return 0;
+	}
